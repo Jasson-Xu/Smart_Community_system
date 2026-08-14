@@ -68,9 +68,11 @@ test("server-renders registration, login, and logout pages", async () => {
   ]);
 
   assert.match(registrationHtml, /Create your account/);
+  assert.match(registrationHtml, /Create an account to get started/);
   assert.match(registrationHtml, /Registration is not connected to a database yet\./);
   assert.match(registrationHtml, /name="confirmPassword"/);
   assert.match(loginHtml, /Sign in to your account/);
+  assert.match(loginHtml, /Sign in to get started/);
   assert.match(loginHtml, /name="password"/);
   assert.match(logoutHtml, /Ready to sign out\?/);
   assert.match(logoutHtml, /No authentication cookie, token, or server session exists yet\./);

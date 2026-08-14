@@ -27,7 +27,7 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthShell eyebrow="Welcome back" title="Sign in to your account" description="Continue to your reports and council updates.">
+    <AuthShell eyebrow="Welcome back" title="Sign in to your account" description="Continue to your reports and council updates." asideMessage="Sign in to get started">
       <div className="auth-notice"><strong>UI preview</strong><span>Login is not connected to a backend yet.</span></div>
       <form className="auth-form" onSubmit={submitLogin} noValidate>
         <label htmlFor="login-email">Email address</label>

@@ -41,7 +41,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthShell eyebrow="Resident registration" title="Create your account" description="Set up one place to submit issues and follow their progress.">
+    <AuthShell eyebrow="Resident registration" title="Create your account" description="Set up one place to submit issues and follow their progress." asideMessage="Create an account to get started">
       <div className="auth-notice"><strong>UI preview</strong><span>Registration is not connected to a database yet.</span></div>
       <form className="auth-form" onSubmit={submitRegistration} noValidate>
         <label htmlFor="register-name">Full name</label>
