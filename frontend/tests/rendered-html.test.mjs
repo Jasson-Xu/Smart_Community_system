@@ -32,9 +32,12 @@ test("server-renders the Smart Community homepage", async () => {
   assert.match(html, /<title>Smart Community \| Report local issues<\/title>/i);
   assert.match(html, /A simpler way to make local issues visible\./);
   assert.match(html, /Report an issue/);
+  assert.match(html, /class="button button-primary" href="\/login\?intent=report"/);
   assert.match(html, /Prototype preview/);
   assert.match(html, /href="\/privacy"/);
   assert.match(html, /href="\/security"/);
+  assert.match(html, /href="\/login\?intent=report(?:&amp;|&)category=roads-footpaths"/);
+  assert.match(html, /href="\/login\?intent=report(?:&amp;|&)category=street-lighting"/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|react-loading-skeleton/i);
 });
 
@@ -73,6 +76,7 @@ test("server-renders registration, login, and logout pages", async () => {
   assert.match(registrationHtml, /name="confirmPassword"/);
   assert.match(loginHtml, /Sign in to your account/);
   assert.match(loginHtml, /Sign in to get started/);
+  assert.match(loginHtml, /Sign in to start using the system and submit your report\./);
   assert.match(loginHtml, /name="password"/);
   assert.match(logoutHtml, /Ready to sign out\?/);
   assert.match(logoutHtml, /No authentication cookie, token, or server session exists yet\./);

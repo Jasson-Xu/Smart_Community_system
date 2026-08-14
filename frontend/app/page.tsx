@@ -3,10 +3,10 @@
 import { FormEvent, useState } from "react";
 
 const categories = [
-  { name: "Roads & footpaths", detail: "Potholes, cracks and access hazards", mark: "RF" },
-  { name: "Street lighting", detail: "Faulty or damaged public lighting", mark: "SL" },
-  { name: "Waste & dumping", detail: "Illegal dumping and overflowing bins", mark: "WD" },
-  { name: "Parks & facilities", detail: "Playgrounds, signs and shared spaces", mark: "PF" },
+  { name: "Roads & footpaths", detail: "Potholes, cracks and access hazards", mark: "RF", slug: "roads-footpaths" },
+  { name: "Street lighting", detail: "Faulty or damaged public lighting", mark: "SL", slug: "street-lighting" },
+  { name: "Waste & dumping", detail: "Illegal dumping and overflowing bins", mark: "WD", slug: "waste-dumping" },
+  { name: "Parks & facilities", detail: "Playgrounds, signs and shared spaces", mark: "PF", slug: "parks-facilities" },
 ];
 
 const updates = [
@@ -89,9 +89,9 @@ export default function Home() {
             Report a problem in minutes, follow every update, and help council teams respond with the right information from the start.
           </p>
         <div className="hero-actions">
-            <button className="button button-primary" type="button" onClick={openReport}>
+            <a className="button button-primary" href="/login?intent=report">
               Report an issue <span aria-hidden="true">→</span>
-            </button>
+            </a>
             <a className="button button-secondary" href="#track">Track a report</a>
           </div>
           <p className="account-prompt">Want to keep all your reports together? <a href="/register">Create a resident account</a></p>
@@ -137,18 +137,18 @@ export default function Home() {
             <p className="eyebrow">Start with the issue</p>
             <h2>What would you like to report?</h2>
           </div>
-          <button className="link-button" type="button" onClick={openReport}>View all categories →</button>
+          <a className="link-button" href="/login?intent=report">View all categories →</a>
         </div>
         <div className="category-grid">
           {categories.map((category) => (
-            <button className="category-card" type="button" key={category.name} onClick={openReport}>
+            <a className="category-card" href={`/login?intent=report&category=${category.slug}`} key={category.name}>
               <span className="category-mark" aria-hidden="true">{category.mark}</span>
               <span>
                 <strong>{category.name}</strong>
                 <small>{category.detail}</small>
               </span>
               <b aria-hidden="true">↗</b>
-            </button>
+            </a>
           ))}
         </div>
       </section>

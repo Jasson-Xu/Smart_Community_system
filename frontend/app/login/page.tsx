@@ -28,7 +28,7 @@ export default function LoginPage() {
 
   return (
     <AuthShell eyebrow="Welcome back" title="Sign in to your account" description="Continue to your reports and council updates." asideMessage="Sign in to get started">
-      <div className="auth-notice"><strong>UI preview</strong><span>Login is not connected to a backend yet.</span></div>
+      <div className="auth-notice"><strong>Sign in required</strong><span>Sign in to start using the system and submit your report.</span></div>
       <form className="auth-form" onSubmit={submitLogin} noValidate>
         <label htmlFor="login-email">Email address</label>
         <input id="login-email" name="email" type="email" autoComplete="email" placeholder="you@example.com" aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "login-email-error" : undefined} />
