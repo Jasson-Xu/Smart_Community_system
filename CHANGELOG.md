@@ -15,6 +15,7 @@ The project intends to follow [Semantic Versioning](https://semver.org/) when ve
 - Interactive issue-reporting and report-tracking prototypes.
 - Public website privacy and security pages.
 - Automated production-build and rendered-route tests.
+- Frontend-only registration, login, and logout pages with accessible validation states.
 
 ## [0.1.0] - 2026-08-14
 

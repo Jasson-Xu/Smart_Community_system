@@ -68,7 +68,7 @@ Native mobile applications, AI-based classification, emergency dispatch, automat
 
 ## Frontend development
 
-The first resident-facing frontend is available in [`frontend/`](frontend/). It includes the responsive homepage, interactive report-flow prototype, report tracking preview, and public privacy and security pages.
+The first resident-facing frontend is available in [`frontend/`](frontend/). It includes the responsive homepage, interactive report-flow prototype, report tracking preview, registration/login/logout pages, and public privacy and security pages. Account pages currently demonstrate frontend validation only; backend identity and persistence are intentionally deferred.
 
 Requirements:
 

@@ -50,6 +50,32 @@ test("server-renders public privacy and security pages", async () => {
   assert.match(await securityResponse.text(), /Security is part of the service\./);
 });
 
+test("server-renders registration, login, and logout pages", async () => {
+  const [registrationResponse, loginResponse, logoutResponse] = await Promise.all([
+    render("/register"),
+    render("/login"),
+    render("/logout"),
+  ]);
+
+  assert.equal(registrationResponse.status, 200);
+  assert.equal(loginResponse.status, 200);
+  assert.equal(logoutResponse.status, 200);
+
+  const [registrationHtml, loginHtml, logoutHtml] = await Promise.all([
+    registrationResponse.text(),
+    loginResponse.text(),
+    logoutResponse.text(),
+  ]);
+
+  assert.match(registrationHtml, /Create your account/);
+  assert.match(registrationHtml, /Registration is not connected to a database yet\./);
+  assert.match(registrationHtml, /name="confirmPassword"/);
+  assert.match(loginHtml, /Sign in to your account/);
+  assert.match(loginHtml, /name="password"/);
+  assert.match(logoutHtml, /Ready to sign out\?/);
+  assert.match(logoutHtml, /No authentication cookie, token, or server session exists yet\./);
+});
+
 test("uses the approved palette and production metadata", async () => {
   const [css, layout, packageJson] = await Promise.all([
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),

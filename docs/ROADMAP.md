@@ -2,6 +2,8 @@
 
 This roadmap prioritises a secure, demonstrable core workflow for an individual project. Dates and scope should be refined through the product backlog as evidence emerges.
 
+> **Current progress:** Registration, login, and logout interface pages are complete. Account persistence, password hashing, authenticated sessions, API authorisation, and PostgreSQL integration remain pending backend work.
+
 | Week | Focus | Expected outcome |
 | --- | --- | --- |
 | 1 | Proposal and requirements | Confirm scope, stakeholders, requirements, risks, and success measures. |

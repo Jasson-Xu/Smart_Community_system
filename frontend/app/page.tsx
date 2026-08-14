@@ -66,7 +66,7 @@ export default function Home() {
           <a href="#services" onClick={() => setMenuOpen(false)}>Report issues</a>
           <a href="#how-it-works" onClick={() => setMenuOpen(false)}>How it works</a>
           <a href="#community" onClick={() => setMenuOpen(false)}>Community</a>
-          <button className="text-button" type="button" disabled title="Authentication will be added in the next implementation stage">Sign in soon</button>
+          <a className="text-button" href="/login">Sign in</a>
         </nav>
 
         <button
@@ -88,12 +88,13 @@ export default function Home() {
           <p className="hero-intro">
             Report a problem in minutes, follow every update, and help council teams respond with the right information from the start.
           </p>
-          <div className="hero-actions">
+        <div className="hero-actions">
             <button className="button button-primary" type="button" onClick={openReport}>
               Report an issue <span aria-hidden="true">→</span>
             </button>
             <a className="button button-secondary" href="#track">Track a report</a>
           </div>
+          <p className="account-prompt">Want to keep all your reports together? <a href="/register">Create a resident account</a></p>
           <div className="hero-assurance" aria-label="Service highlights">
             <span>Accessible on any device</span>
             <span>Clear status updates</span>
@@ -231,6 +232,7 @@ export default function Home() {
           <a href="#how-it-works">How it works</a>
           <a href="/privacy">Privacy</a>
           <a href="/security">Security</a>
+          <a href="/login">Account</a>
         </div>
         <p>Academic prototype · SDG 11: Sustainable Cities and Communities</p>
       </footer>
