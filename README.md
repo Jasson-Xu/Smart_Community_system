@@ -66,9 +66,22 @@ The initial release covers registration, authentication, role-based access, issu
 
 Native mobile applications, AI-based classification, emergency dispatch, automatic translation, and integration with existing council systems are outside the initial scope.
 
-## Repository setup
+## Frontend development
 
-Application source code has not yet been scaffolded. Setup and run instructions will be added with the first executable implementation. Until then, repository changes should follow the standards in [CONTRIBUTING.md](CONTRIBUTING.md).
+The first resident-facing frontend is available in [`frontend/`](frontend/). It includes the responsive homepage, interactive report-flow prototype, report tracking preview, and public privacy and security pages.
+
+Requirements:
+
+- Node.js 22.13 or later
+- npm
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Use `npm test` to create a production build and verify the rendered routes. Repository changes should follow the standards in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Responsible use
 

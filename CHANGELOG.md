@@ -11,6 +11,10 @@ The project intends to follow [Semantic Versioning](https://semver.org/) when ve
 - Professional repository documentation and governance baseline.
 - Project requirements, architecture, and 12-week delivery roadmap.
 - Privacy, security, contribution, conduct, and licensing policies.
+- Responsive resident-facing frontend using the approved civic colour palette.
+- Interactive issue-reporting and report-tracking prototypes.
+- Public website privacy and security pages.
+- Automated production-build and rendered-route tests.
 
 ## [0.1.0] - 2026-08-14
 
