@@ -53,6 +53,7 @@ See [Architecture](docs/ARCHITECTURE.md) for boundaries and design principles.
 
 - [Requirements](docs/REQUIREMENTS.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Proposed database design](docs/DATABASE.md)
 - [Delivery roadmap](docs/ROADMAP.md)
 - [Privacy policy](PRIVACY.md)
 - [Security policy](SECURITY.md)

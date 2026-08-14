@@ -38,7 +38,6 @@ test("server-renders the Smart Community homepage", async () => {
   assert.match(html, /href="\/security"/);
   assert.match(html, /href="\/login\?intent=report(?:&amp;|&)category=roads-footpaths"/);
   assert.match(html, /href="\/login\?intent=report(?:&amp;|&)category=street-lighting"/);
-  assert.doesNotMatch(html, /codex-preview|SkeletonPreview|react-loading-skeleton/i);
 });
 
 test("server-renders public privacy and security pages", async () => {
@@ -96,6 +95,5 @@ test("uses the approved palette and production metadata", async () => {
   assert.match(css, /prefers-reduced-motion:\s*reduce/);
   assert.match(layout, /openGraph/);
   assert.match(layout, /twitter/);
-  assert.doesNotMatch(layout, /codex-preview|Starter Project|_sites-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
 });

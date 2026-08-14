@@ -44,6 +44,5 @@ npm test
 - `app/globals.css` — design system, responsive layout, and accessibility states
 - `public/og.png` — site-specific social preview card
 - `tests/` — rendered HTML and design-token checks
-- `.openai/hosting.json` — Sites hosting capabilities
 
 The production backend remains planned as ASP.NET Core Web API with PostgreSQL. No D1, R2, application-owned authentication, or persistent browser storage is enabled in this frontend stage.
