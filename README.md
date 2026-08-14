@@ -1,32 +1,79 @@
 # Smart Community System
 
-The Smart Community System is a secure and accessible web platform for reporting and managing community issues. It supports problems affecting public infrastructure, environmental quality, accessibility, and community safety, such as potholes, damaged footpaths, broken streetlights, illegal dumping, and other local hazards.
+A secure, accessible web platform for residents to report community issues and for council teams to manage them from submission through resolution.
 
-Residents can submit structured reports with descriptions, locations, and photographs, then monitor their progress. Council staff can validate, prioritise, assign, and update reports through an operational dashboard. Administrators can manage users, roles, issue categories, system settings, and audit records.
+The system supports concerns affecting public infrastructure, environmental quality, accessibility, and community safety, including potholes, broken streetlights, damaged footpaths, illegal dumping, and similar local hazards. It contributes to **United Nations Sustainable Development Goal 11: Sustainable Cities and Communities** by improving service visibility, accountability, and community participation.
 
-The project supports **United Nations Sustainable Development Goal 11: Sustainable Cities and Communities** by improving communication, accountability, community participation, and the management of local services.
+> **Project status:** Planning and foundation. This is an individual, 12-week academic project and is not currently a production council service.
 
-## Project objectives
+## Core capabilities
 
-- Simplify issue reporting for residents.
-- Improve the completeness and accuracy of submitted information.
-- Provide visible progress updates and report history.
-- Help council staff search, prioritise, assign, and resolve reports.
-- Protect personal information and system resources.
-- Support accessible use across desktop and mobile devices.
-- Provide useful statistics for service improvement.
+### Residents
+
+- Register and authenticate securely.
+- Submit an issue with a category, description, location, and photographs.
+- Receive a unique report reference.
+- Track status updates and report history.
+- Add relevant comments and provide feedback after resolution.
+
+### Council staff
+
+- Review, search, and filter incoming reports.
+- Validate reports and identify potential duplicates.
+- Set priorities and assign work.
+- Record progress and update report status.
+- View operational statistics.
+
+### Administrators
+
+- Manage users, roles, and issue categories.
+- Maintain system settings.
+- Review important activity through audit records.
 
 ## Technology stack
 
-- **Frontend:** React
-- **Backend:** ASP.NET Core Web API
-- **Database:** PostgreSQL with Entity Framework Core and Npgsql
-- **Local development:** Docker
-- **Cloud infrastructure:** Amazon EC2, Amazon RDS for PostgreSQL, and Amazon S3
-- **Version control:** Git and GitHub
+| Area | Technology |
+| --- | --- |
+| Web client | React |
+| API | ASP.NET Core Web API |
+| Data access | Entity Framework Core with Npgsql |
+| Database | PostgreSQL |
+| Local environment | Docker |
+| Application hosting | Amazon EC2 |
+| Production database | Amazon RDS for PostgreSQL |
+| Photograph storage | Amazon S3 |
 
-## Project scope
+## Architecture
 
-The initial release will include registration and authentication, role-based permissions, issue submission, categories, locations, photograph uploads, report tracking, resident and staff dashboards, assignments, priorities, status updates, comments, notifications, feedback, basic statistics, and audit records.
+The application separates the web interface, API and business logic, relational data, and photograph storage. PostgreSQL runs in Docker during local development. In production, the API is planned for Amazon EC2, structured data for Amazon RDS for PostgreSQL, and uploaded photographs for Amazon S3.
 
-This is an individual project planned for delivery over 12 weeks using an iterative Agile approach.
+See [Architecture](docs/ARCHITECTURE.md) for boundaries and design principles.
+
+## Documentation
+
+- [Requirements](docs/REQUIREMENTS.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Delivery roadmap](docs/ROADMAP.md)
+- [Privacy policy](PRIVACY.md)
+- [Security policy](SECURITY.md)
+- [Contributing guide](CONTRIBUTING.md)
+- [Code of conduct](CODE_OF_CONDUCT.md)
+- [Changelog](CHANGELOG.md)
+
+## Scope
+
+The initial release covers registration, authentication, role-based access, issue submission, locations, photograph uploads, report tracking, dashboards, assignments, priorities, status updates, comments, notifications, feedback, basic statistics, and audit records.
+
+Native mobile applications, AI-based classification, emergency dispatch, automatic translation, and integration with existing council systems are outside the initial scope.
+
+## Repository setup
+
+Application source code has not yet been scaffolded. Setup and run instructions will be added with the first executable implementation. Until then, repository changes should follow the standards in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Responsible use
+
+Do not use this prototype to collect real personal information or operational council reports. Any production deployment requires an identified service operator, a completed privacy assessment, verified retention rules, security testing, incident-response procedures, and appropriate legal review.
+
+## Licence
+
+Source code and repository documentation are available under the [MIT Licence](LICENSE).

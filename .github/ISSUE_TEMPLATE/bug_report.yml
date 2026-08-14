@@ -1,0 +1,52 @@
+name: Bug report
+description: Report a reproducible problem without including personal or security-sensitive information.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, personal information, or vulnerability details. Follow SECURITY.md for security reports.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      placeholder: |
+        1. Go to ...
+        2. Select ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: input
+    id: revision
+    attributes:
+      label: Version or commit
+      description: Release version or commit hash where the issue occurs.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, operating system, and relevant local configuration without secrets.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Additional evidence
+      description: Sanitised logs or screenshots. Remove personal information and secrets first.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched for an existing issue.
+          required: true
+        - label: I removed credentials and personal information.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true
