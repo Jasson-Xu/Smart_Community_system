@@ -82,7 +82,7 @@ public static class ReportsEndpoints
         await db.SaveChangesAsync();
         var response = new ReportDetailResponse(report.ReferenceNo, category.Name, category.Slug,
             report.Description, report.Location, report.Latitude, report.Longitude, report.GooglePlaceId,
-            submittedStatus.Code, submittedStatus.Name, report.SubmittedAt,
+            report.Priority, submittedStatus.Code, submittedStatus.Name, report.SubmittedAt,
             [new StatusHistoryResponse(submittedStatus.Name, now, "Report submitted")]);
         return Results.Created($"/api/v1/reports/{report.ReferenceNo}", response);
     }
@@ -109,7 +109,7 @@ public static class ReportsEndpoints
         };
         return Results.Ok(await query
             .Select(report => new ReportSummaryResponse(report.ReferenceNo, report.Category.Name,
-                report.Location, report.Latitude, report.Longitude, report.CurrentStatus.Code,
+                report.Location, report.Latitude, report.Longitude, report.Priority, report.CurrentStatus.Code,
                 report.CurrentStatus.Name, report.SubmittedAt))
             .ToListAsync());
     }
@@ -122,7 +122,7 @@ public static class ReportsEndpoints
             .Where(item => item.ResidentId == residentId && item.ReferenceNo == normalisedReference)
             .Select(item => new ReportDetailResponse(item.ReferenceNo, item.Category.Name, item.Category.Slug,
                 item.Description, item.Location, item.Latitude, item.Longitude, item.GooglePlaceId,
-                item.CurrentStatus.Code, item.CurrentStatus.Name, item.SubmittedAt,
+                item.Priority, item.CurrentStatus.Code, item.CurrentStatus.Name, item.SubmittedAt,
                 db.StatusHistory.Where(history => history.ReportId == item.Id)
                     .OrderBy(history => history.ChangedAt)
                     .Select(history => new StatusHistoryResponse(history.Status.Name, history.ChangedAt, history.Note))
@@ -141,7 +141,7 @@ public static class ReportsEndpoints
         var recentReports = await db.Reports.AsNoTracking().Where(report => report.ResidentId == residentId)
             .OrderByDescending(report => report.SubmittedAt).Take(5)
             .Select(report => new ReportSummaryResponse(report.ReferenceNo, report.Category.Name,
-                report.Location, report.Latitude, report.Longitude, report.CurrentStatus.Code,
+                report.Location, report.Latitude, report.Longitude, report.Priority, report.CurrentStatus.Code,
                 report.CurrentStatus.Name, report.SubmittedAt))
             .ToListAsync();
         return Results.Ok(new ResidentDashboardResponse(statusCounts.Sum(status => status.Count),
@@ -195,11 +195,12 @@ public record CategoryResponse(Guid Id, string Slug, string Name, string Descrip
 public record CreateReportRequest(Guid? CategoryId, string? Description, string? Location,
     decimal? Latitude, decimal? Longitude, string? GooglePlaceId);
 public record ReportSummaryResponse(string Reference, string Category, string Location,
-    decimal? Latitude, decimal? Longitude, string StatusCode, string Status, DateTimeOffset SubmittedAt);
+    decimal? Latitude, decimal? Longitude, string Priority, string StatusCode, string Status, DateTimeOffset SubmittedAt);
 public record StatusHistoryResponse(string Status, DateTimeOffset ChangedAt, string? Note);
 public record ReportDetailResponse(string Reference, string Category, string CategorySlug, string Description,
     string Location, decimal? Latitude, decimal? Longitude, string? GooglePlaceId,
-    string StatusCode, string Status, DateTimeOffset SubmittedAt, IReadOnlyList<StatusHistoryResponse> History);
+    string Priority, string StatusCode, string Status, DateTimeOffset SubmittedAt,
+    IReadOnlyList<StatusHistoryResponse> History);
 public record StatusCountResponse(string Code, string Name, int Count);
 public record ResidentDashboardResponse(int TotalReports, IReadOnlyList<StatusCountResponse> StatusCounts,
     IReadOnlyList<ReportSummaryResponse> RecentReports);

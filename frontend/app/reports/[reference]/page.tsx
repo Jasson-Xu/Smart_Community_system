@@ -77,6 +77,7 @@ export default function ReportDetailPage() {
              <dl className="report-facts">
                <div><dt>Reference</dt><dd>{report.reference}</dd></div>
                <div><dt>Submitted</dt><dd>{formatReportDate(report.submittedAt)}</dd></div>
+               <div><dt>Priority</dt><dd>{report.priority}</dd></div>
                <div><dt>Map coordinates</dt><dd>{report.latitude !== null && report.longitude !== null ? <a className="map-link" href={`https://www.google.com/maps/search/?api=1&query=${report.latitude},${report.longitude}`} target="_blank" rel="noreferrer">{report.latitude.toFixed(6)}, {report.longitude.toFixed(6)} ↗</a> : "Not selected"}</dd></div>
                <div className="fact-wide"><dt>Description</dt><dd>{report.description}</dd></div>
                <div className="fact-wide"><dt>Photographs</dt><dd>Photograph upload is deferred while Week 6 remains paused.</dd></div>

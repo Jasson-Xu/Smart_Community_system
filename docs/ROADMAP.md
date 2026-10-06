@@ -4,7 +4,7 @@ This roadmap prioritises a secure, demonstrable core workflow for an individual 
 
 Each week ends with a review of the implemented code, documentation, and verification results. Work on the following week begins after the project owner confirms the current week's result. The project owner handles Git commits and pushes.
 
-> **Current progress:** Week 7 implementation and local verification are complete, awaiting project-owner confirmation. Residents now have a database-backed dashboard, status filtering and sorting, report timelines, and ownership-protected comments. Week 6 photograph handling was deferred by the project owner and remains in the backlog.
+> **Current progress:** Week 8 implementation and local verification are complete, awaiting project-owner confirmation. Staff and administrators can search and filter the operational queue, set priority, preserve assignment history, progress reports through validated status transitions, reply to residents, and record potential duplicates. Week 6 photograph handling remains deferred.
 
 | Week | Focus | Expected outcome |
 | --- | --- | --- |
@@ -56,3 +56,13 @@ Optional functions should be deferred before any essential privacy, security, ac
 - Confirm invalid comments are rejected and another resident receives 404 for the report conversation.
 - Run the API build, frontend TypeScript check, and the focused report smoke test.
 - Review the [Week 7 implementation notes](WEEK_07.md) and confirm the week before starting Week 8.
+
+## Week 8 acceptance gate
+
+- Confirm Resident accounts receive 403 from staff operations endpoints while Staff and Administrator roles are authorised.
+- Search and filter the report queue, then set a report priority and assign it to a staff account.
+- Confirm invalid status jumps are rejected and valid transitions create immutable history entries.
+- Add a staff reply and confirm it appears in the resident report conversation.
+- Record a potential duplicate and confirm neither report is deleted or merged automatically.
+- Run the API build, frontend TypeScript check, and focused staff workflow smoke test.
+- Review the [Week 8 implementation notes](WEEK_08.md) and confirm the week before starting Week 9.

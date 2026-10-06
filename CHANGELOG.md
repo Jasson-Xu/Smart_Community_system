@@ -8,6 +8,7 @@ The project intends to follow [Semantic Versioning](https://semver.org/) when ve
 
 ### Added
 
+- Week 8 staff dashboard, searchable report queue, priority, assignment history, controlled status transitions, staff replies, and potential duplicate review.
 - Week 7 resident dashboard with per-status totals and recent reports.
 - Resident report status filtering, sorting, chronological comments, and ownership enforcement.
 - Week 5 report categories, lifecycle statuses, report persistence, unique references, and initial status history.

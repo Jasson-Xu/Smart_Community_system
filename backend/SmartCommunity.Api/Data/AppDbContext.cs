@@ -11,6 +11,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<CommunityReport> Reports => Set<CommunityReport>();
     public DbSet<StatusHistoryEntry> StatusHistory => Set<StatusHistoryEntry>();
     public DbSet<ReportComment> Comments => Set<ReportComment>();
+    public DbSet<ReportAssignment> Assignments => Set<ReportAssignment>();
+    public DbSet<DuplicateReview> DuplicateReviews => Set<DuplicateReview>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -52,6 +54,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             table.HasCheckConstraint("CK_reports_latitude", "latitude IS NULL OR (latitude >= -90 AND latitude <= 90)");
             table.HasCheckConstraint("CK_reports_longitude", "longitude IS NULL OR (longitude >= -180 AND longitude <= 180)");
             table.HasCheckConstraint("CK_reports_coordinate_pair", "(latitude IS NULL AND longitude IS NULL) OR (latitude IS NOT NULL AND longitude IS NOT NULL)");
+            table.HasCheckConstraint("CK_reports_priority", "priority IN ('Low', 'Normal', 'High', 'Urgent')");
         });
         reports.HasKey(report => report.Id);
         reports.Property(report => report.Id).HasColumnName("id");
@@ -74,6 +77,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
         reports.Property(report => report.Latitude).HasColumnName("latitude").HasPrecision(9, 6);
         reports.Property(report => report.Longitude).HasColumnName("longitude").HasPrecision(9, 6);
         reports.Property(report => report.GooglePlaceId).HasColumnName("google_place_id").HasMaxLength(255);
+        reports.Property(report => report.Priority).HasColumnName("priority").HasMaxLength(16)
+            .HasDefaultValue(ReportPriorities.Normal).IsRequired();
         reports.Property(report => report.SubmittedAt).HasColumnName("submitted_at").IsRequired();
 
         var history = modelBuilder.Entity<StatusHistoryEntry>();
@@ -106,6 +111,41 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             .OnDelete(DeleteBehavior.Restrict);
         comments.Property(comment => comment.Body).HasColumnName("body").HasMaxLength(1000).IsRequired();
         comments.Property(comment => comment.CreatedAt).HasColumnName("created_at").IsRequired();
+
+        var assignments = modelBuilder.Entity<ReportAssignment>();
+        assignments.ToTable("assignments");
+        assignments.HasKey(assignment => assignment.Id);
+        assignments.Property(assignment => assignment.Id).HasColumnName("id");
+        assignments.Property(assignment => assignment.ReportId).HasColumnName("report_id");
+        assignments.HasOne(assignment => assignment.Report).WithMany().HasForeignKey(assignment => assignment.ReportId)
+            .OnDelete(DeleteBehavior.Cascade);
+        assignments.HasIndex(assignment => new { assignment.ReportId, assignment.AssignedAt });
+        assignments.Property(assignment => assignment.AssignedToUserId).HasColumnName("assigned_to_user_id");
+        assignments.HasOne(assignment => assignment.AssignedToUser).WithMany().HasForeignKey(assignment => assignment.AssignedToUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+        assignments.HasIndex(assignment => new { assignment.AssignedToUserId, assignment.AssignedAt });
+        assignments.Property(assignment => assignment.AssignedByUserId).HasColumnName("assigned_by_user_id");
+        assignments.HasOne(assignment => assignment.AssignedByUser).WithMany().HasForeignKey(assignment => assignment.AssignedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+        assignments.Property(assignment => assignment.AssignedAt).HasColumnName("assigned_at").IsRequired();
+
+        var duplicateReviews = modelBuilder.Entity<DuplicateReview>();
+        duplicateReviews.ToTable("duplicate_reviews", table => table.HasCheckConstraint(
+            "CK_duplicate_reviews_different_reports", "report_id <> potential_duplicate_report_id"));
+        duplicateReviews.HasKey(review => review.Id);
+        duplicateReviews.Property(review => review.Id).HasColumnName("id");
+        duplicateReviews.Property(review => review.ReportId).HasColumnName("report_id");
+        duplicateReviews.HasOne(review => review.Report).WithMany().HasForeignKey(review => review.ReportId)
+            .OnDelete(DeleteBehavior.Cascade);
+        duplicateReviews.Property(review => review.PotentialDuplicateReportId).HasColumnName("potential_duplicate_report_id");
+        duplicateReviews.HasOne(review => review.PotentialDuplicateReport).WithMany()
+            .HasForeignKey(review => review.PotentialDuplicateReportId).OnDelete(DeleteBehavior.Restrict);
+        duplicateReviews.HasIndex(review => new { review.ReportId, review.PotentialDuplicateReportId }).IsUnique();
+        duplicateReviews.Property(review => review.MarkedByUserId).HasColumnName("marked_by_user_id");
+        duplicateReviews.HasOne(review => review.MarkedByUser).WithMany().HasForeignKey(review => review.MarkedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+        duplicateReviews.Property(review => review.Note).HasColumnName("note").HasMaxLength(500);
+        duplicateReviews.Property(review => review.CreatedAt).HasColumnName("created_at").IsRequired();
 
         categories.HasData(
             new IssueCategory { Id = Guid.Parse("3f8d8599-7bbd-4f05-a915-7196b552f001"), Slug = "roads-footpaths", Name = "Roads & footpaths", Description = "Potholes, cracks and access hazards", SortOrder = 10 },

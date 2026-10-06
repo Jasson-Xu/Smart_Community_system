@@ -5,6 +5,7 @@ export type ReportSummary = {
   location: string;
   latitude: number | null;
   longitude: number | null;
+  priority: string;
   statusCode: string;
   status: string;
   submittedAt: string;

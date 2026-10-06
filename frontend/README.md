@@ -11,6 +11,8 @@ The resident-facing website for the Smart Community System. This first implement
 - Google Maps place search and map-pin selection with a manual location fallback;
 - a resident dashboard with status totals and recent reports;
 - resident-owned report filtering, detail timelines, and comments;
+- a staff operations dashboard and searchable report queue;
+- staff priority, assignment, status, reply, and duplicate-review controls;
 - issue categories, status examples, and community metrics;
 - public privacy and security information; and
 - production-build and rendered-route tests.
@@ -61,6 +63,9 @@ npm test
 - `app/_components/GoogleLocationPicker.tsx` — Google place search, map marker, and manual fallback
 - `app/reports/page.tsx` — filtered and sorted current-resident report list
 - `app/reports/[reference]/page.tsx` — owned report detail, status timeline, and comments
+- `app/staff/page.tsx` — staff operational totals and recent reports
+- `app/staff/reports/page.tsx` — searchable and filterable council report queue
+- `app/staff/reports/[reference]/page.tsx` — staff workflow and report review controls
 - `app/_lib/api.ts` — credentialed API requests
 - `app/globals.css` — design system, responsive layout, and accessibility states
 - `public/og.png` — site-specific social preview card

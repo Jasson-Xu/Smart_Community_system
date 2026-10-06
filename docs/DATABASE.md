@@ -1,6 +1,6 @@
 # Proposed Database Design
 
-This document defines the target PostgreSQL data model for the Smart Community System. Week 4 created `users`; Week 5 added `categories`, `report_statuses`, `reports`, and `status_history`; Week 7 adds `comments`. The remaining workflow and governance tables are scheduled for later weeks.
+This document defines the target PostgreSQL data model for the Smart Community System. Week 4 created `users`; Week 5 added `categories`, `report_statuses`, `reports`, and `status_history`; Week 7 added `comments`; Week 8 adds report priority, `assignments`, and `duplicate_reviews`. The remaining governance tables are scheduled for later weeks.
 
 The initial `users` table has a single `role` column so the API can enforce Resident, Staff, and Administrator access. The target `roles` and `user_roles` tables below remain a later design step; migration to those tables must preserve existing account roles. Week 5 report references use `SC-<year>-<12 hexadecimal characters>` and are protected by a unique database index. A report can also store `latitude`, `longitude`, and `google_place_id` supplied by the Google Maps picker.
 
@@ -25,6 +25,7 @@ The initial `users` table has a single `role` column so the API can enforce Resi
 | Reporting | `reports` | The main community issue record and location. |
 | Workflow | `report_photos` | Metadata for privately stored report images. |
 | Workflow | `assignments` | Report assignment history for council staff. |
+| Workflow | `duplicate_reviews` | Staff-recorded potential duplicate relationships without automatic deletion. |
 | Workflow | `status_history` | Immutable report status transitions. |
 | Workflow | `comments` | Implemented chronological resident report discussion, with staff participation planned for Week 8. |
 | Engagement | `notifications` | Delivery and read state for report updates. |
@@ -37,11 +38,14 @@ The initial `users` table has a single `role` column so the API can enforce Resi
 - Unique indexes: `users.email`, `roles.name`, `categories.name`, `report_statuses.code`, `reports.reference_no`, and `report_photos.object_key`.
 - Composite primary key: `user_roles(user_id, role_id)`.
 - One feedback record per report: unique `feedback.report_id`.
+- Priority constraint: `reports.priority` is Low, Normal, High, or Urgent.
+- One directional duplicate-review record per report pair.
 - Rating constraint: `feedback.rating BETWEEN 1 AND 5`.
 - Coordinate constraints: latitude from -90 to 90 and longitude from -180 to 180.
 - Coordinate pair constraint: latitude and longitude must either both be present or both be null; manually entered locations can omit both.
 - Report lookup indexes: `(resident_id, submitted_at DESC)`, `(current_status_id, priority, submitted_at)`, and `(category_id, submitted_at)`.
 - Workflow indexes: `(report_id, changed_at)`, `(report_id, assigned_at)`, and `(report_id, created_at)` for comments.
+- Staff workload index: `(assigned_to_user_id, assigned_at)` for assignment history.
 - Comment bodies are limited to 1,000 characters and retain their author and creation timestamp.
 - Notification index: `(recipient_id, read_at, created_at DESC)`.
 - Audit index: `(entity_type, entity_id, created_at DESC)` and `(actor_user_id, created_at DESC)`.

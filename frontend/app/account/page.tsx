@@ -39,7 +39,10 @@ export default function AccountPage() {
             {account.role === "Resident" ? <>
               <p>Create a new community report or review issues already submitted from this account.</p>
               <div className="logout-actions"><Link className="button button-primary" href="/dashboard">Dashboard</Link><Link className="button button-secondary" href="/reports/new">New report</Link><Link className="button button-secondary" href="/reports">My reports</Link></div>
-            </> : <p>The {account.role.toLowerCase()} operational dashboard is scheduled for a later week.</p>}
+            </> : <>
+              <p>Open the council operations workspace to review, prioritise, assign, and progress community reports.</p>
+              <div className="logout-actions"><Link className="button button-primary" href="/staff">Staff dashboard</Link><Link className="button button-secondary" href="/staff/reports">Report queue</Link></div>
+            </>}
             <Link className="button button-secondary account-signout" href="/logout">Sign out</Link>
           </>
         ) : (

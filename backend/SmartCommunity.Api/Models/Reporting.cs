@@ -33,7 +33,17 @@ public sealed class CommunityReport
     public decimal? Latitude { get; set; }
     public decimal? Longitude { get; set; }
     public string? GooglePlaceId { get; set; }
+    public string Priority { get; set; } = ReportPriorities.Normal;
     public DateTimeOffset SubmittedAt { get; set; }
+}
+
+public static class ReportPriorities
+{
+    public const string Low = "Low";
+    public const string Normal = "Normal";
+    public const string High = "High";
+    public const string Urgent = "Urgent";
+    public static readonly string[] All = [Low, Normal, High, Urgent];
 }
 
 public sealed class StatusHistoryEntry
@@ -57,5 +67,30 @@ public sealed class ReportComment
     public Guid AuthorId { get; set; }
     public AppUser Author { get; set; } = null!;
     public string Body { get; set; } = "";
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
+public sealed class ReportAssignment
+{
+    public Guid Id { get; set; }
+    public Guid ReportId { get; set; }
+    public CommunityReport Report { get; set; } = null!;
+    public Guid AssignedToUserId { get; set; }
+    public AppUser AssignedToUser { get; set; } = null!;
+    public Guid AssignedByUserId { get; set; }
+    public AppUser AssignedByUser { get; set; } = null!;
+    public DateTimeOffset AssignedAt { get; set; }
+}
+
+public sealed class DuplicateReview
+{
+    public Guid Id { get; set; }
+    public Guid ReportId { get; set; }
+    public CommunityReport Report { get; set; } = null!;
+    public Guid PotentialDuplicateReportId { get; set; }
+    public CommunityReport PotentialDuplicateReport { get; set; } = null!;
+    public Guid MarkedByUserId { get; set; }
+    public AppUser MarkedByUser { get; set; } = null!;
+    public string? Note { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
 }
