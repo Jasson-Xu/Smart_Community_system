@@ -41,6 +41,11 @@ export default function DashboardPage() {
            <article className="summary-card"><span>Completed</span><strong>{dashboard.statusCounts.filter(item => item.code === "RESOLVED" || item.code === "CLOSED").reduce((total, item) => total + item.count, 0)}</strong><small>Resolved or closed</small></article>
          </section>
          <section className="dashboard-panel">
+           <div className="panel-heading"><div><p className="eyebrow">Your updates</p><h2>Notifications and feedback</h2></div><Link href="/notifications">View notifications →</Link></div>
+           <p><strong>{dashboard.unreadNotifications}</strong> unread status updates · <strong>{dashboard.feedbackPending}</strong> completed reports awaiting feedback</p>
+           {dashboard.feedbackPending > 0 && <Link href="/reports">Review completed reports →</Link>}
+         </section>
+         <section className="dashboard-panel">
            <div className="panel-heading"><div><p className="eyebrow">Current workload</p><h2>Reports by status</h2></div><Link className="button button-primary" href="/reports/new">New report</Link></div>
            <div className="status-count-grid">
              {dashboard.statusCounts.map(item => <Link href={`/reports?status=${encodeURIComponent(item.code)}`} className="status-count" key={item.code}><strong>{item.count}</strong><span>{item.name}</span></Link>)}

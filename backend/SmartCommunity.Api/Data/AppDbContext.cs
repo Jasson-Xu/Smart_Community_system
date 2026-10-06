@@ -15,6 +15,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<ReportComment> Comments => Set<ReportComment>();
     public DbSet<ReportAssignment> Assignments => Set<ReportAssignment>();
     public DbSet<DuplicateReview> DuplicateReviews => Set<DuplicateReview>();
+    public DbSet<ReportNotification> Notifications => Set<ReportNotification>();
+    public DbSet<ReportFeedback> Feedback => Set<ReportFeedback>();
     public DbSet<SystemSetting> SystemSettings => Set<SystemSetting>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
@@ -169,6 +171,35 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             .OnDelete(DeleteBehavior.Restrict);
         duplicateReviews.Property(review => review.Note).HasColumnName("note").HasMaxLength(500);
         duplicateReviews.Property(review => review.CreatedAt).HasColumnName("created_at").IsRequired();
+
+        var notifications = modelBuilder.Entity<ReportNotification>();
+        notifications.ToTable("report_notifications");
+        notifications.HasKey(item => item.Id);
+        notifications.Property(item => item.Id).HasColumnName("id");
+        notifications.Property(item => item.RecipientId).HasColumnName("recipient_id");
+        notifications.HasOne(item => item.Recipient).WithMany().HasForeignKey(item => item.RecipientId).OnDelete(DeleteBehavior.Restrict);
+        notifications.Property(item => item.ReportId).HasColumnName("report_id");
+        notifications.HasOne(item => item.Report).WithMany().HasForeignKey(item => item.ReportId).OnDelete(DeleteBehavior.Cascade);
+        notifications.Property(item => item.StatusHistoryId).HasColumnName("status_history_id");
+        notifications.HasOne(item => item.StatusHistory).WithMany().HasForeignKey(item => item.StatusHistoryId).OnDelete(DeleteBehavior.Cascade);
+        notifications.HasIndex(item => item.StatusHistoryId).IsUnique();
+        notifications.HasIndex(item => new { item.RecipientId, item.CreatedAt });
+        notifications.Property(item => item.StatusCode).HasColumnName("status_code").HasMaxLength(40).IsRequired();
+        notifications.Property(item => item.CreatedAt).HasColumnName("created_at").IsRequired();
+        notifications.Property(item => item.ReadAt).HasColumnName("read_at");
+
+        var feedback = modelBuilder.Entity<ReportFeedback>();
+        feedback.ToTable("report_feedback", table => table.HasCheckConstraint("CK_report_feedback_rating", "rating >= 1 AND rating <= 5"));
+        feedback.HasKey(item => item.Id);
+        feedback.Property(item => item.Id).HasColumnName("id");
+        feedback.Property(item => item.ReportId).HasColumnName("report_id");
+        feedback.HasOne(item => item.Report).WithMany().HasForeignKey(item => item.ReportId).OnDelete(DeleteBehavior.Cascade);
+        feedback.HasIndex(item => item.ReportId).IsUnique();
+        feedback.Property(item => item.ResidentId).HasColumnName("resident_id");
+        feedback.HasOne(item => item.Resident).WithMany().HasForeignKey(item => item.ResidentId).OnDelete(DeleteBehavior.Restrict);
+        feedback.Property(item => item.Rating).HasColumnName("rating").IsRequired();
+        feedback.Property(item => item.Comment).HasColumnName("comment").HasMaxLength(1000);
+        feedback.Property(item => item.SubmittedAt).HasColumnName("submitted_at").IsRequired();
 
         var settings = modelBuilder.Entity<SystemSetting>();
         settings.ToTable("system_settings", table => table.HasCheckConstraint("CK_system_settings_version", "version > 0"));

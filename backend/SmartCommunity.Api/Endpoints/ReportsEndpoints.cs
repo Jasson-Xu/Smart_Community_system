@@ -144,8 +144,12 @@ public static class ReportsEndpoints
                 report.Location, report.Latitude, report.Longitude, report.Priority, report.CurrentStatus.Code,
                 report.CurrentStatus.Name, report.SubmittedAt))
             .ToListAsync();
+        var unreadNotifications = await db.Notifications.CountAsync(item => item.RecipientId == residentId && item.ReadAt == null);
+        var feedbackPending = await db.Reports.CountAsync(report => report.ResidentId == residentId &&
+            (report.CurrentStatus.Code == "RESOLVED" || report.CurrentStatus.Code == "CLOSED") &&
+            !db.Feedback.Any(item => item.ReportId == report.Id));
         return Results.Ok(new ResidentDashboardResponse(statusCounts.Sum(status => status.Count),
-            statusCounts, recentReports));
+            unreadNotifications, feedbackPending, statusCounts, recentReports));
     }
 
     private static async Task<IResult> ListComments(string reference, ClaimsPrincipal principal, AppDbContext db)
@@ -202,7 +206,8 @@ public record ReportDetailResponse(string Reference, string Category, string Cat
     string Priority, string StatusCode, string Status, DateTimeOffset SubmittedAt,
     IReadOnlyList<StatusHistoryResponse> History);
 public record StatusCountResponse(string Code, string Name, int Count);
-public record ResidentDashboardResponse(int TotalReports, IReadOnlyList<StatusCountResponse> StatusCounts,
+public record ResidentDashboardResponse(int TotalReports, int UnreadNotifications, int FeedbackPending,
+    IReadOnlyList<StatusCountResponse> StatusCounts,
     IReadOnlyList<ReportSummaryResponse> RecentReports);
 public record CreateCommentRequest(string? Body);
 public record CommentResponse(Guid Id, string AuthorName, string Body, DateTimeOffset CreatedAt);

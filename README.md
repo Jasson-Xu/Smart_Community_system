@@ -4,14 +4,14 @@ A secure, accessible web platform for residents to report community issues and f
 
 The system supports concerns affecting public infrastructure, environmental quality, accessibility, and community safety, including potholes, broken streetlights, damaged footpaths, illegal dumping, and similar local hazards. It contributes to **United Nations Sustainable Development Goal 11: Sustainable Cities and Communities** by improving service visibility, accountability, and community participation.
 
-> **Project status:** Week 9 administration and audit controls have passed local verification and await project-owner confirmation. Week 6 photograph handling is deferred. This is an individual, 12-week academic project and is not a production council service.
+> **Project status:** Week 10 notifications, feedback, and dashboard insight have passed local verification and await project-owner confirmation. Week 6 photograph handling is deferred. This is an individual, 12-week academic project and is not a production council service.
 
 ## Core capabilities
 
 ### Residents
 
 - Register and authenticate securely.
-- Submit an issue with a category, description, location, and photographs.
+- Submit an issue with a category, description, and location. Photograph handling is deferred.
 - Receive a unique report reference.
 - Track status updates and report history.
 - Add relevant comments and provide feedback after resolution.

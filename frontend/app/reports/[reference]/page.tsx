@@ -5,13 +5,18 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ResidentShell } from "../../_components/ResidentShell";
 import { apiFetch, errorMessage } from "../../_lib/api";
-import { formatReportDate, type ReportComment, type ReportDetail } from "../../_lib/reporting";
+import { formatReportDate, type FeedbackState, type ReportComment, type ReportDetail } from "../../_lib/reporting";
 
 export default function ReportDetailPage() {
   const params = useParams<{ reference: string }>();
   const reference = decodeURIComponent(params.reference ?? "").toUpperCase();
   const [report, setReport] = useState<ReportDetail | null>(null);
   const [comments, setComments] = useState<ReportComment[]>([]);
+  const [feedbackState, setFeedbackState] = useState<FeedbackState | null>(null);
+  const [rating, setRating] = useState(5);
+  const [feedbackComment, setFeedbackComment] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
   const [commentBody, setCommentBody] = useState("");
   const [commentMessage, setCommentMessage] = useState("");
   const [submittingComment, setSubmittingComment] = useState(false);
@@ -24,7 +29,8 @@ export default function ReportDetailPage() {
     Promise.all([
       apiFetch(`/reports/${encodeURIComponent(reference)}`, { signal: controller.signal }),
       apiFetch(`/reports/${encodeURIComponent(reference)}/comments`, { signal: controller.signal }),
-    ]).then(async ([reportResponse, commentsResponse]) => {
+      apiFetch(`/reports/${encodeURIComponent(reference)}/feedback`, { signal: controller.signal }),
+    ]).then(async ([reportResponse, commentsResponse, feedbackResponse]) => {
       if (reportResponse.status === 401) { setSignedOut(true); return; }
       if (reportResponse.status === 404) { setStatus("This report was not found in your account."); return; }
       if (reportResponse.status === 403) { setStatus("Report details are available to resident accounts."); return; }
@@ -32,6 +38,8 @@ export default function ReportDetailPage() {
       setReport(await reportResponse.json() as ReportDetail);
       if (commentsResponse.ok) setComments(await commentsResponse.json() as ReportComment[]);
       else setCommentMessage("Comments could not be loaded.");
+      if (feedbackResponse.ok) setFeedbackState(await feedbackResponse.json() as FeedbackState);
+      else setFeedbackMessage("Feedback could not be loaded.");
       setStatus("");
     }).catch((error: unknown) => {
       if (!(error instanceof DOMException && error.name === "AbortError")) setStatus("The reporting service is unavailable.");
@@ -65,6 +73,21 @@ export default function ReportDetailPage() {
     }
   }
 
+  async function submitFeedback(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmittingFeedback(true);
+    setFeedbackMessage("");
+    try {
+      const response = await apiFetch(`/reports/${encodeURIComponent(reference)}/feedback`, {
+        method: "POST", body: JSON.stringify({ rating, comment: feedbackComment }),
+      });
+      if (!response.ok) { setFeedbackMessage(await errorMessage(response, "Feedback could not be submitted.")); return; }
+      setFeedbackState({ eligible: true, feedback: await response.json() });
+      setFeedbackMessage("Thank you for your feedback.");
+    } catch { setFeedbackMessage("The feedback service is unavailable."); }
+    finally { setSubmittingFeedback(false); }
+  }
+
   return (
     <ResidentShell eyebrow="Report details" title={report?.reference ?? (reference || "Report")}
       description="Review the submitted information, status timeline, and conversation for this report.">
@@ -83,6 +106,18 @@ export default function ReportDetailPage() {
                <div className="fact-wide"><dt>Photographs</dt><dd>Photograph upload is deferred while Week 6 remains paused.</dd></div>
              </dl>
            </section>
+           {feedbackState?.eligible && <section className="comments-card">
+             <div className="comments-heading"><div><p className="eyebrow">Service experience</p><h2>Feedback</h2></div></div>
+             {feedbackState.feedback ? <p>You rated this resolution {feedbackState.feedback.rating}/5 on {formatReportDate(feedbackState.feedback.submittedAt)}.{feedbackState.feedback.comment && <> “{feedbackState.feedback.comment}”</>}</p> :
+               <form className="comment-form" onSubmit={submitFeedback}>
+                 <label htmlFor="feedback-rating">How satisfied are you with the resolution?</label>
+                 <select id="feedback-rating" value={rating} onChange={event => setRating(Number(event.target.value))}>{[5, 4, 3, 2, 1].map(value => <option key={value} value={value}>{value} / 5</option>)}</select>
+                 <label htmlFor="feedback-comment">Comment (optional)</label>
+                 <textarea id="feedback-comment" rows={3} maxLength={1000} value={feedbackComment} onChange={event => setFeedbackComment(event.target.value)} />
+                 <button className="button button-primary" type="submit" disabled={submittingFeedback}>{submittingFeedback ? "Submitting..." : "Submit feedback"}</button>
+               </form>}
+             {feedbackMessage && <p role="status">{feedbackMessage}</p>}
+           </section>}
            <section className="comments-card">
              <div className="comments-heading"><div><p className="eyebrow">Report conversation</p><h2>Comments</h2></div><span>{comments.length}</span></div>
              {comments.length === 0 ? <p className="comments-empty">No comments yet. Add context or an update for this report.</p> : <ol className="comments-list">{comments.map(comment => <li key={comment.id}><div><strong>{comment.authorName}</strong><time dateTime={comment.createdAt}>{formatReportDate(comment.createdAt)}</time></div><p>{comment.body}</p></li>)}</ol>}

@@ -94,3 +94,29 @@ public sealed class DuplicateReview
     public string? Note { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
 }
+
+public sealed class ReportNotification
+{
+    public Guid Id { get; set; }
+    public Guid RecipientId { get; set; }
+    public AppUser Recipient { get; set; } = null!;
+    public Guid ReportId { get; set; }
+    public CommunityReport Report { get; set; } = null!;
+    public Guid StatusHistoryId { get; set; }
+    public StatusHistoryEntry StatusHistory { get; set; } = null!;
+    public string StatusCode { get; set; } = "";
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? ReadAt { get; set; }
+}
+
+public sealed class ReportFeedback
+{
+    public Guid Id { get; set; }
+    public Guid ReportId { get; set; }
+    public CommunityReport Report { get; set; } = null!;
+    public Guid ResidentId { get; set; }
+    public AppUser Resident { get; set; } = null!;
+    public int Rating { get; set; }
+    public string? Comment { get; set; }
+    public DateTimeOffset SubmittedAt { get; set; }
+}

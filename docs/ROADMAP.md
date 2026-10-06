@@ -4,7 +4,7 @@ This roadmap prioritises a secure, demonstrable core workflow for an individual 
 
 Each week ends with a review of the implemented code, documentation, and verification results. Work on the following week begins after the project owner confirms the current week's result. The project owner handles Git commits and pushes.
 
-> **Current progress:** Week 9 implementation and local verification are complete, awaiting project-owner confirmation. Administrators can manage active accounts, normalised roles, issue categories, approved non-secret settings, and append-only audit records. Week 6 photograph handling remains deferred.
+> **Current progress:** Week 10 implementation and local verification are complete, awaiting project-owner confirmation. Residents receive in-app status notifications, can give one rating after resolution, and see engagement totals. Staff can review 30-day submission and resolution counts. Week 6 photograph handling remains deferred.
 
 | Week | Focus | Expected outcome |
 | --- | --- | --- |
@@ -78,3 +78,12 @@ Optional functions should be deferred before any essential privacy, security, ac
 - Confirm an administrator cannot deactivate itself or remove its own Administrator role.
 - Run the API build, frontend TypeScript check, and focused administration smoke test.
 - Review the [Week 9 implementation notes](WEEK_09.md) and confirm the week before starting Week 10.
+
+## Week 10 acceptance gate
+
+- Confirm a staff status transition creates exactly one notification for the report owner in the same save operation.
+- Confirm a resident can view and mark only their own notifications as read.
+- Confirm feedback is available only on owned resolved or closed reports, accepts ratings 1–5, and can be submitted once.
+- Confirm resident notification and feedback totals and staff 30-day activity totals agree with stored data.
+- Run the API build, frontend TypeScript check, and a focused Week 10 smoke check.
+- Review the [Week 10 implementation notes](WEEK_10.md) before starting Week 11.

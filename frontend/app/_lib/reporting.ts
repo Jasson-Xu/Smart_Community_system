@@ -15,9 +15,17 @@ export type ReportComment = { id: string; authorName: string; body: string; crea
 export type StatusCount = { code: string; name: string; count: number };
 export type ResidentDashboard = {
   totalReports: number;
+  unreadNotifications: number;
+  feedbackPending: number;
   statusCounts: StatusCount[];
   recentReports: ReportSummary[];
 };
+export type ReportNotification = {
+  id: string; reference: string; statusCode: string; status: string;
+  createdAt: string; readAt: string | null;
+};
+export type Feedback = { rating: number; comment: string | null; submittedAt: string };
+export type FeedbackState = { eligible: boolean; feedback: Feedback | null };
 export type ReportDetail = ReportSummary & {
   categorySlug: string;
   description: string;

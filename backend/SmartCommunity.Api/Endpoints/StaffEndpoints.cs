@@ -46,9 +46,12 @@ public static class StaffEndpoints
         var totalReports = statusCounts.Where(status => status.Code != "CLOSED").Sum(status => status.Count);
         var unassignedReports = await db.Reports.CountAsync(report => report.CurrentStatus.Code != "CLOSED" &&
             !db.Assignments.Any(item => item.ReportId == report.Id));
+        var since = DateTimeOffset.UtcNow.AddDays(-30);
+        var submittedLast30Days = await db.Reports.CountAsync(report => report.SubmittedAt >= since);
+        var resolvedLast30Days = await db.StatusHistory.CountAsync(item => item.Status.Code == "RESOLVED" && item.ChangedAt >= since);
         return Results.Ok(new StaffDashboardResponse(totalReports, unassignedReports,
             priorityCounts.SingleOrDefault(item => item.Code == ReportPriorities.Urgent)?.Count ?? 0,
-            statusCounts, priorityCounts, recentReports));
+            submittedLast30Days, resolvedLast30Days, statusCounts, priorityCounts, recentReports));
     }
 
     private static async Task<IResult> GetAssignableUsers(AppDbContext db) => Results.Ok(
@@ -195,10 +198,16 @@ public static class StaffEndpoints
         var targetStatus = await db.ReportStatuses.SingleAsync(item => item.Code == targetCode);
         var changedAt = DateTimeOffset.UtcNow;
         report.CurrentStatusId = targetStatus.Id;
-        db.StatusHistory.Add(new StatusHistoryEntry
+        var history = new StatusHistoryEntry
         {
             Id = Guid.NewGuid(), ReportId = report.Id, StatusId = targetStatus.Id,
             ChangedByUserId = actorId, Note = string.IsNullOrWhiteSpace(note) ? null : note, ChangedAt = changedAt
+        };
+        db.StatusHistory.Add(history);
+        db.Notifications.Add(new ReportNotification
+        {
+            Id = Guid.NewGuid(), RecipientId = report.ResidentId, ReportId = report.Id,
+            StatusHistoryId = history.Id, StatusCode = targetStatus.Code, CreatedAt = changedAt
         });
         await db.SaveChangesAsync();
         return Results.Ok(new StaffHistoryResponse(targetStatus.Code, targetStatus.Name,
@@ -275,6 +284,7 @@ public static class StaffEndpoints
 
 public record StaffCountResponse(string Code, string Name, int Count);
 public record StaffDashboardResponse(int TotalReports, int UnassignedReports, int UrgentReports,
+    int SubmittedLast30Days, int ResolvedLast30Days,
     IReadOnlyList<StaffCountResponse> StatusCounts, IReadOnlyList<StaffCountResponse> PriorityCounts,
     IReadOnlyList<StaffReportSummaryResponse> RecentReports);
 public record StaffUserResponse(Guid Id, string Name, string Email, string Role);

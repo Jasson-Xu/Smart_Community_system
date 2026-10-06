@@ -36,6 +36,9 @@ export default function StaffDashboardPage() {
            <article className="summary-card"><span>Unassigned</span><strong>{dashboard.unassignedReports}</strong><small>Open reports requiring an owner</small></article>
            <article className="summary-card summary-card-urgent"><span>Urgent</span><strong>{dashboard.urgentReports}</strong><small>Open reports marked for immediate attention</small></article>
          </section>
+         <section className="dashboard-panel"><div className="panel-heading"><div><p className="eyebrow">Last 30 days</p><h2>Service activity</h2></div></div>
+           <div className="status-count-grid"><div className="status-count"><strong>{dashboard.submittedLast30Days}</strong><span>Reports submitted</span></div><div className="status-count"><strong>{dashboard.resolvedLast30Days}</strong><span>Reports resolved</span></div></div>
+         </section>
          <section className="dashboard-panel">
            <div className="panel-heading"><div><p className="eyebrow">Workflow</p><h2>Reports by status</h2></div><Link className="button button-primary" href="/staff/reports">Open report queue</Link></div>
            <div className="status-count-grid">{dashboard.statusCounts.map(item => <Link href={`/staff/reports?status=${encodeURIComponent(item.code)}`} className="status-count" key={item.code}><strong>{item.count}</strong><span>{item.name}</span></Link>)}</div>

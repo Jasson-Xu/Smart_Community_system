@@ -13,6 +13,8 @@ export type StaffDashboard = {
   totalReports: number;
   unassignedReports: number;
   urgentReports: number;
+  submittedLast30Days: number;
+  resolvedLast30Days: number;
   statusCounts: StaffCount[];
   priorityCounts: StaffCount[];
   recentReports: StaffReportSummary[];

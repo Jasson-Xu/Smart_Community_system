@@ -177,6 +177,7 @@ app.MapGet("/api/v1/staff/me", (ClaimsPrincipal user) => Results.Ok(new { role =
 app.MapGet("/api/v1/admin/me", (ClaimsPrincipal user) => Results.Ok(new { role = user.FindFirstValue(ClaimTypes.Role) }))
     .RequireAuthorization(policy => policy.RequireRole(Roles.Administrator));
 app.MapReportsEndpoints();
+app.MapWeek10Endpoints();
 app.MapStaffEndpoints();
 app.MapAdminEndpoints();
 
