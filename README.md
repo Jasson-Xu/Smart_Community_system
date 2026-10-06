@@ -6,6 +6,17 @@ The system supports concerns affecting public infrastructure, environmental qual
 
 > **Project status:** Week 10 notifications, feedback, and dashboard insight have passed local verification and await project-owner confirmation. Week 6 photograph handling is deferred. This is an individual, 12-week academic project and is not a production council service.
 
+## Online demo accounts
+
+Open the [Smart Community sign-in page](https://15-135-238-18.sslip.io/login) and use one of these accounts:
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Resident | `resident.demo@example.test` | `DemoPass123!` |
+| Staff | `staff.demo@example.test` | `DemoPass123!` |
+
+These accounts are for testing with synthetic data. The hosted administrator account is private and is not listed here. The administrator demo account described in the local development guide is not created on the hosted site.
+
 ## Core capabilities
 
 ### Residents

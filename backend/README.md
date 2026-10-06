@@ -85,7 +85,9 @@ After applying the migration, run `pwsh -File scripts/seed-demo-accounts.ps1` fr
 | Staff | `staff.demo@example.test` | `DemoPass123!` |
 | Administrator | `admin.demo@example.test` | `DemoPass123!` |
 
-The local login page also displays these credentials. All three roles currently reach the account page; staff and administrator dashboards are planned for later weeks. The seed command refuses to run outside Development.
+The local login page also displays these credentials. The seed command refuses to run outside Development.
+
+The local administrator demo account is not provisioned on the hosted site. See the [online demo accounts](../README.md#online-demo-accounts) for the hosted sign-in details.
 
 ## Verification
 
