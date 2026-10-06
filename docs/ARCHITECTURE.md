@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document records the target architecture for the Smart Community System. Identity, reporting, staff operations, administration, in-app status notifications, resolution feedback, and dashboard statistics are implemented. Photograph storage and AWS deployment remain target components.
+This document records the target architecture for the Smart Community System. Identity, reporting, staff operations, administration, in-app status notifications, resolution feedback, and dashboard statistics are implemented. An academic demo is hosted on Amazon EC2; photograph storage remains a target component.
 
 ## System context
 
@@ -28,7 +28,7 @@ Entity Framework Core   Photograph service
     PostgreSQL       Amazon S3
 ```
 
-For local development, PostgreSQL will run in Docker and photograph storage may use a development-safe adapter. The planned production environment uses Amazon EC2 for the application, Amazon RDS for PostgreSQL, and Amazon S3 for photographs.
+For local development, PostgreSQL runs in Docker. The hosted academic demo runs the frontend, API, Caddy, and PostgreSQL on one Amazon EC2 instance. The diagram shows a future design that could move PostgreSQL to Amazon RDS and add Amazon S3 for photographs; neither service is connected to the hosted demo.
 
 ## Application boundaries
 

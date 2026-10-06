@@ -93,4 +93,4 @@ The local administrator demo account is not provisioned on the hosted site. See 
 
 Run `dotnet build backend/SmartCommunity.Api`, `pwsh -File scripts/smoke-auth.ps1`, and `pwsh -File scripts/smoke-reports.ps1` after the database and API are running. The report test creates synthetic residents and reports, then verifies report validation, dashboard totals, filtering, comments, ownership, and role restrictions.
 
-The API does not yet implement photograph storage, notifications, feedback, account recovery, or production deployment. Those remain scheduled or deferred to later work.
+The hosted academic demo runs the API on Amazon EC2. Photograph storage and account recovery are not yet implemented.

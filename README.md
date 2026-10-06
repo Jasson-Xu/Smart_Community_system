@@ -4,7 +4,13 @@ A secure, accessible web platform for residents to report community issues and f
 
 The system supports concerns affecting public infrastructure, environmental quality, accessibility, and community safety, including potholes, broken streetlights, damaged footpaths, illegal dumping, and similar local hazards. It contributes to **United Nations Sustainable Development Goal 11: Sustainable Cities and Communities** by improving service visibility, accountability, and community participation.
 
-> **Project status:** Week 10 notifications, feedback, and dashboard insight have passed local verification and await project-owner confirmation. Week 6 photograph handling is deferred. This is an individual, 12-week academic project and is not a production council service.
+> **Project status:** An academic demo is live on Amazon EC2. Photograph storage is deferred. This is an individual, 12-week academic project and is not a production council service.
+
+## EC2 deployment
+
+**Public URL:** [https://15-135-238-18.sslip.io/](https://15-135-238-18.sslip.io/)
+
+The hosted demo runs on Amazon Linux 2023. Caddy serves HTTPS and forwards requests to the React frontend and ASP.NET Core API. PostgreSQL runs on the same EC2 instance. The frontend, API, database, and Caddy services are running, and the public homepage and sign-in page respond successfully. Amazon RDS and S3 are not connected to this deployment; photograph uploads remain deferred.
 
 ## Online demo accounts
 
@@ -52,12 +58,12 @@ These accounts are for testing with synthetic data. The hosted administrator acc
 | Location search and map | Google Maps JavaScript API and Places API (New) |
 | Local environment | Docker |
 | Application hosting | Amazon EC2 |
-| Production database | Amazon RDS for PostgreSQL |
-| Photograph storage | Amazon S3 |
+| Hosted demo database | PostgreSQL on Amazon EC2 |
+| Planned photograph storage | Amazon S3 (not connected) |
 
 ## Architecture
 
-The application separates the web interface, API and business logic, relational data, and photograph storage. PostgreSQL runs in Docker during local development. In production, the API is planned for Amazon EC2, structured data for Amazon RDS for PostgreSQL, and uploaded photographs for Amazon S3.
+The application separates the web interface, API and business logic, and relational data. PostgreSQL runs in Docker during local development and on the EC2 instance for the hosted demo. Amazon RDS and S3 remain possible future infrastructure components.
 
 See [Architecture](docs/ARCHITECTURE.md) for boundaries and design principles.
 
@@ -75,7 +81,7 @@ See [Architecture](docs/ARCHITECTURE.md) for boundaries and design principles.
 
 ## Scope
 
-The initial release covers registration, authentication, role-based access, issue submission, locations, photograph uploads, report tracking, dashboards, assignments, priorities, status updates, comments, notifications, feedback, basic statistics, and audit records.
+The hosted demo covers registration, authentication, role-based access, issue submission, locations, report tracking, dashboards, assignments, priorities, status updates, comments, notifications, feedback, basic statistics, and audit records. Photograph uploads remain deferred.
 
 Native mobile applications, AI-based classification, emergency dispatch, automatic translation, and integration with existing council systems are outside the initial scope.
 
