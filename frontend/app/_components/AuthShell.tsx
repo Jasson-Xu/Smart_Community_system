@@ -1,22 +1,23 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
 
 type AuthShellProps = {
   eyebrow: string;
   title: string;
   description: string;
   asideMessage?: string;
+  homeHref?: string;
+  homeLabel?: string;
   children: ReactNode;
 };
 
-export function AuthShell({ eyebrow, title, description, asideMessage, children }: AuthShellProps) {
+export function AuthShell({ eyebrow, title, description, asideMessage, homeHref = "/", homeLabel = "Back to home", children }: AuthShellProps) {
   return (
     <main className="auth-page">
       <section className="auth-aside">
-        <Link className="auth-brand" href="/" aria-label="Smart Community home">
+        <a className="auth-brand" href={homeHref} aria-label={homeHref === "/" ? "Smart Community home" : "Smart Community dashboard"}>
           <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
           <span><strong>Smart Community</strong><small>Local issues, clearly managed</small></span>
-        </Link>
+        </a>
         {asideMessage ? (
           <div className="auth-aside-simple">
             <h2>{asideMessage}</h2>
@@ -40,7 +41,7 @@ export function AuthShell({ eyebrow, title, description, asideMessage, children 
 
       <section className="auth-main">
         <div className="auth-panel">
-          <Link className="auth-back" href="/">← Back to home</Link>
+          <a className="auth-back" href={homeHref}>← {homeLabel}</a>
           <header>
             <p className="eyebrow">{eyebrow}</p>
             <h1>{title}</h1>

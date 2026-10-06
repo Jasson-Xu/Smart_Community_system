@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
 
 export function AdminShell({ eyebrow, title, description, children }: {
   eyebrow: string;
@@ -10,17 +9,17 @@ export function AdminShell({ eyebrow, title, description, children }: {
   return (
     <main className="resident-page admin-page">
       <header className="resident-header admin-header">
-        <Link className="brand" href="/admin" aria-label="Smart Community administration">
+        <a className="brand" href="/admin" aria-label="Smart Community administration">
           <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
           <span><strong>Smart Community</strong><small>Administration</small></span>
-        </Link>
+        </a>
         <nav aria-label="Administrator navigation">
-          <Link href="/admin">Dashboard</Link>
-          <Link href="/admin/users">Users</Link>
-          <Link href="/admin/categories">Categories</Link>
-          <Link href="/admin/settings">Settings</Link>
-          <Link href="/admin/audit">Audit</Link>
-          <Link href="/account">Account</Link>
+          <a href="/admin">Dashboard</a>
+          <a href="/admin/users">Users</a>
+          <a href="/admin/categories">Categories</a>
+          <a href="/admin/settings">Settings</a>
+          <a href="/admin/audit">Audit</a>
+          <a href="/account">Account</a>
         </nav>
       </header>
       <section className="resident-content admin-content">

@@ -1,14 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ResidentShell } from "../_components/ResidentShell";
 import { apiFetch } from "../_lib/api";
 import { formatReportDate, type ReportNotification } from "../_lib/reporting";
 
 export default function NotificationsPage() {
-  const router = useRouter();
   const [items, setItems] = useState<ReportNotification[]>([]);
   const [status, setStatus] = useState("Loading notifications...");
 
@@ -34,12 +31,12 @@ export default function NotificationsPage() {
 
   async function openReport(item: ReportNotification) {
     try { await markRead(item); } catch { setStatus("The notification could not be marked as read."); }
-    router.push(`/reports/${item.reference}`);
+    window.location.assign(`/reports/${encodeURIComponent(item.reference)}`);
   }
 
   return <ResidentShell eyebrow="Report updates" title="Notifications" description="Status changes for reports you submitted.">
     {status && <p role="status">{status}</p>}
-    {!status && items.length === 0 && <div className="empty-state"><p>No status updates yet.</p><Link href="/reports">View my reports</Link></div>}
+    {!status && items.length === 0 && <div className="empty-state"><p>No status updates yet.</p><a href="/reports">View my reports</a></div>}
     <div className="reports-list">{items.map(item => <div className="report-row" key={item.id}>
       <span className="report-reference">{item.reference}</span>
       <span><strong>{item.readAt ? "Status updated" : "New status update"}</strong><small>Now {item.status}</small></span>

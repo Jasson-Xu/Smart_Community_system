@@ -14,10 +14,12 @@ using SmartCommunity.Api.Models;
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-if (builder.Environment.IsDevelopment())
+var keysPath = builder.Configuration["DataProtection:KeysPath"];
+if (!string.IsNullOrWhiteSpace(keysPath) || builder.Environment.IsDevelopment())
 {
-    var keyPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath,
-        "..", "..", ".docker-data", "data-protection-keys"));
+    var keyPath = !string.IsNullOrWhiteSpace(keysPath) ? Path.GetFullPath(keysPath) :
+        Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath,
+            "..", "..", ".docker-data", "data-protection-keys"));
     Directory.CreateDirectory(keyPath);
     builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(keyPath));
 }
@@ -82,7 +84,8 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var app = builder.Build();
-if (!app.Environment.IsDevelopment()) app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment() && !builder.Configuration.GetValue<bool>("ReverseProxy:Enabled"))
+    app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("Frontend");
 app.Use(async (context, next) =>
@@ -180,6 +183,14 @@ app.MapReportsEndpoints();
 app.MapWeek10Endpoints();
 app.MapStaffEndpoints();
 app.MapAdminEndpoints();
+
+if (args.Contains("--migrate"))
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    await scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
+    Console.WriteLine("Database migrations applied.");
+    return;
+}
 
 if (args.Contains("--bootstrap-role"))
 {

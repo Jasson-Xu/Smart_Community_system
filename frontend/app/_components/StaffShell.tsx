@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
 
 export function StaffShell({ eyebrow, title, description, children }: {
   eyebrow: string;
@@ -10,15 +9,15 @@ export function StaffShell({ eyebrow, title, description, children }: {
   return (
     <main className="resident-page staff-page">
       <header className="resident-header">
-        <Link className="brand" href="/staff" aria-label="Smart Community staff dashboard">
+        <a className="brand" href="/staff" aria-label="Smart Community staff dashboard">
           <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
           <span><strong>Smart Community</strong><small>Council operations</small></span>
-        </Link>
+        </a>
         <nav aria-label="Staff navigation">
-          <Link href="/staff">Dashboard</Link>
-          <Link href="/staff/reports">All reports</Link>
-          <Link href="/account">Account</Link>
-          <Link href="/logout">Sign out</Link>
+          <a href="/staff">Dashboard</a>
+          <a href="/staff/reports">All reports</a>
+          <a href="/account">Account</a>
+          <a href="/logout">Sign out</a>
         </nav>
       </header>
       <section className="resident-content staff-content">

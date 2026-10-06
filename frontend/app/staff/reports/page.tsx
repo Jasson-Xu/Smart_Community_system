@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { StaffShell } from "../../_components/StaffShell";
 import { apiFetch } from "../../_lib/api";
 import { formatReportDate } from "../../_lib/reporting";
@@ -77,7 +76,7 @@ export default function StaffReportsPage() {
 
   return (
     <StaffShell eyebrow="Operational queue" title="All reports" description="Search, filter, prioritise, assign, and progress resident reports.">
-      {signedOut ? <div className="empty-state"><h2>Sign in required</h2><p>Use a staff or administrator account to continue.</p><Link className="button button-primary" href="/login?next=/staff/reports">Sign in</Link></div> : <>
+      {signedOut ? <div className="empty-state"><h2>Sign in required</h2><p>Use a staff or administrator account to continue.</p><a className="button button-primary" href="/login?next=/staff/reports">Sign in</a></div> : <>
         <form className="staff-report-filters" onSubmit={apply}>
           <div className="search-control"><label htmlFor="staff-report-search">Search</label><div><input id="staff-report-search" value={query} maxLength={100} onChange={event => setQuery(event.target.value)} placeholder="Reference, location, or description" /><button className="button button-secondary" type="submit">Search</button></div></div>
           <div><label htmlFor="staff-status">Status</label><select id="staff-status" value={statusFilter} onChange={event => updateFilter("status", event.target.value)}><option value="">All statuses</option>{statuses.map(([code, name]) => <option value={code} key={code}>{name}</option>)}</select></div>
@@ -87,12 +86,12 @@ export default function StaffReportsPage() {
         </form>
         {message ? <div className="empty-state"><h2>Queue unavailable</h2><p role="status">{message}</p></div> : reports === null ? <p className="page-status" role="status">Loading report queue...</p> : reports.length === 0 ? <div className="empty-state"><h2>No matching reports</h2><p>Adjust the search or filters to view other reports.</p></div> : <div className="reports-list">
           <div className="list-toolbar"><p>{reports.length} {reports.length === 1 ? "report" : "reports"}</p></div>
-          {reports.map(report => <Link className="report-row staff-report-row" href={`/staff/reports/${report.reference}`} key={report.reference}>
+          {reports.map(report => <a className="report-row staff-report-row" href={`/staff/reports/${report.reference}`} key={report.reference}>
             <span className="report-reference">{report.reference}</span>
             <span><strong>{report.category}</strong><small>{report.location}</small></span>
             <span><b className={`priority-pill priority-${report.priority.toLowerCase()}`}>{report.priority}</b><small>{report.assignedToName ?? "Unassigned"}</small></span>
             <span><b className="status-pill">{report.status}</b><small>{formatReportDate(report.submittedAt)}</small></span>
-          </Link>)}
+          </a>)}
         </div>}
       </>}
     </StaffShell>

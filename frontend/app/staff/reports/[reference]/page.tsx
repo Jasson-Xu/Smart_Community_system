@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { StaffShell } from "../../../_components/StaffShell";
 import { apiFetch, errorMessage } from "../../../_lib/api";
@@ -108,7 +107,7 @@ export default function StaffReportDetailPage() {
   return (
     <StaffShell eyebrow="Report operations" title={report?.reference ?? reference}
       description="Review resident information, assign ownership, progress workflow, and maintain a traceable record.">
-      {signedOut ? <div className="empty-state"><h2>Sign in required</h2><p>Use a staff or administrator account to continue.</p><Link className="button button-primary" href={`/login?next=${encodeURIComponent(`/staff/reports/${reference}`)}`}>Sign in</Link></div> : !report ? <div className="empty-state"><p role="status">{status}</p><Link className="button button-secondary" href="/staff/reports">Back to report queue</Link></div> : <>
+      {signedOut ? <div className="empty-state"><h2>Sign in required</h2><p>Use a staff or administrator account to continue.</p><a className="button button-primary" href={`/login?next=${encodeURIComponent(`/staff/reports/${reference}`)}`}>Sign in</a></div> : !report ? <div className="empty-state"><p role="status">{status}</p><a className="button button-secondary" href="/staff/reports">Back to report queue</a></div> : <>
         {actionMessage && <p className="operation-message" role="status">{actionMessage}</p>}
         <div className="staff-detail-layout">
           <div className="staff-detail-main">
@@ -156,5 +155,5 @@ function AssignmentItem({ item }: { item: Assignment }) {
 }
 
 function DuplicateItem({ item }: { item: DuplicateReview }) {
-  return <li><Link href={`/staff/reports/${item.potentialDuplicateReference}`}>{item.potentialDuplicateReference}</Link><small>{formatReportDate(item.createdAt)} · {item.markedByName}</small>{item.note && <p>{item.note}</p>}</li>;
+  return <li><a href={`/staff/reports/${item.potentialDuplicateReference}`}>{item.potentialDuplicateReference}</a><small>{formatReportDate(item.createdAt)} · {item.markedByName}</small>{item.note && <p>{item.note}</p>}</li>;
 }

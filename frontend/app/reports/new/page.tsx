@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import Link from "next/link";
 import { ResidentShell } from "../../_components/ResidentShell";
 import { GoogleLocationPicker, type LocationSelection } from "../../_components/GoogleLocationPicker";
 import { apiFetch, errorMessage } from "../../_lib/api";
@@ -92,9 +91,9 @@ export default function NewReportPage() {
     <ResidentShell eyebrow="New community report" title="Tell us what needs attention"
       description="Provide the details council staff need to understand and route the issue.">
       {state === "loading" && <p className="page-status" role="status">Loading the secure report form...</p>}
-      {state === "error" && <div className="empty-state"><h2>Report form unavailable</h2><p role="status">{message}</p><Link className="button button-secondary" href="/account">Return to account</Link></div>}
-      {state === "signed-out" && <div className="empty-state"><h2>Sign in required</h2><p>Your account keeps reports private and connected to you.</p><Link className="button button-primary" href="/login?next=/reports/new">Sign in</Link></div>}
-      {state === "wrong-role" && <div className="empty-state"><h2>Resident account required</h2><p>Issue submission is available to resident accounts.</p><Link className="button button-secondary" href="/account">Return to account</Link></div>}
+      {state === "error" && <div className="empty-state"><h2>Report form unavailable</h2><p role="status">{message}</p><a className="button button-secondary" href="/account">Return to account</a></div>}
+      {state === "signed-out" && <div className="empty-state"><h2>Sign in required</h2><p>Your account keeps reports private and connected to you.</p><a className="button button-primary" href="/login?next=/reports/new">Sign in</a></div>}
+      {state === "wrong-role" && <div className="empty-state"><h2>Resident account required</h2><p>Issue submission is available to resident accounts.</p><a className="button button-secondary" href="/account">Return to account</a></div>}
       {state === "edit" && (
         <form className="resident-form" onSubmit={review} noValidate>
           <div className="prototype-note"><strong>Development service</strong><span>Use synthetic information only. Photograph upload will be added in Week 6.</span></div>
@@ -142,8 +141,8 @@ export default function NewReportPage() {
           <h2>{created.reference}</h2>
           <p>Your report is saved with the status <strong>{created.status}</strong>.</p>
           <div className="form-actions">
-            <Link className="button button-primary" href={`/reports/${created.reference}`}>View report</Link>
-            <Link className="button button-secondary" href="/reports">All my reports</Link>
+            <a className="button button-primary" href={`/reports/${created.reference}`}>View report</a>
+            <a className="button button-secondary" href="/reports">All my reports</a>
           </div>
         </section>
       )}

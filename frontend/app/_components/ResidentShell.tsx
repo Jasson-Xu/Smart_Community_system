@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
 
 export function ResidentShell({ eyebrow, title, description, children }: {
   eyebrow: string;
@@ -10,17 +9,17 @@ export function ResidentShell({ eyebrow, title, description, children }: {
   return (
     <main className="resident-page">
       <header className="resident-header">
-        <Link className="brand" href="/dashboard" aria-label="Smart Community resident dashboard">
+        <a className="brand" href="/dashboard" aria-label="Smart Community resident dashboard">
           <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
           <span><strong>Smart Community</strong><small>Resident service</small></span>
-        </Link>
+        </a>
         <nav aria-label="Resident navigation">
-          <Link href="/dashboard">Dashboard</Link>
-          <Link href="/reports">My reports</Link>
-          <Link href="/notifications">Notifications</Link>
-          <Link href="/reports/new">New report</Link>
-          <Link href="/account">Account</Link>
-          <Link href="/logout">Sign out</Link>
+          <a href="/dashboard">Dashboard</a>
+          <a href="/reports">My reports</a>
+          <a href="/notifications">Notifications</a>
+          <a href="/reports/new">New report</a>
+          <a href="/account">Account</a>
+          <a href="/logout">Sign out</a>
         </nav>
       </header>
       <section className="resident-content">

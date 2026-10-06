@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ResidentShell } from "../../_components/ResidentShell";
 import { apiFetch, errorMessage } from "../../_lib/api";
@@ -91,8 +90,8 @@ export default function ReportDetailPage() {
   return (
     <ResidentShell eyebrow="Report details" title={report?.reference ?? (reference || "Report")}
       description="Review the submitted information, status timeline, and conversation for this report.">
-      {signedOut ? <div className="empty-state"><h2>Sign in required</h2><p>Sign in with the resident account that submitted this report.</p><Link className="button button-primary" href={`/login?next=${encodeURIComponent(`/reports/${reference}`)}`}>Sign in</Link></div> :
-       !report ? <div className="empty-state"><p role="status">{status}</p><Link className="button button-secondary" href="/reports">Back to my reports</Link></div> :
+      {signedOut ? <div className="empty-state"><h2>Sign in required</h2><p>Sign in with the resident account that submitted this report.</p><a className="button button-primary" href={`/login?next=${encodeURIComponent(`/reports/${reference}`)}`}>Sign in</a></div> :
+       !report ? <div className="empty-state"><p role="status">{status}</p><a className="button button-secondary" href="/reports">Back to my reports</a></div> :
        <div className="report-detail-grid">
          <div className="report-detail-main">
            <section className="report-detail-card">

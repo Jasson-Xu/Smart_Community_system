@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { AdminShell } from "../../_components/AdminShell";
 import { apiFetch, errorMessage } from "../../_lib/api";
 import type { AdminRole, AdminUser } from "../../_lib/admin";
@@ -41,7 +40,7 @@ export default function AdminUsersPage() {
       <div><label htmlFor="admin-active-filter">Account status</label><select id="admin-active-filter" value={activeFilter} onChange={event => setActiveFilter(event.target.value)}><option value="">All accounts</option><option value="true">Active</option><option value="false">Inactive</option></select></div>
       <button className="button button-secondary" type="submit">Apply filters</button>
     </form>
-    {message ? <div className="empty-state"><p role="status">{message}</p><Link className="button button-secondary" href="/admin">Dashboard</Link></div> : users === null ? <p className="page-status" role="status">Loading users...</p> : <div className="admin-user-list">{users.map(user => <UserCard key={user.id} user={user} availableRoles={roles} onUpdated={loadUsers} />)}</div>}
+    {message ? <div className="empty-state"><p role="status">{message}</p><a className="button button-secondary" href="/admin">Dashboard</a></div> : users === null ? <p className="page-status" role="status">Loading users...</p> : <div className="admin-user-list">{users.map(user => <UserCard key={user.id} user={user} availableRoles={roles} onUpdated={loadUsers} />)}</div>}
   </AdminShell>;
 }
 

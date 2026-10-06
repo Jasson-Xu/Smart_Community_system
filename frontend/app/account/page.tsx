@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { AuthShell } from "../_components/AuthShell";
 import { apiFetch } from "../_lib/api";
 
@@ -27,9 +26,13 @@ export default function AccountPage() {
     return () => controller.abort();
   }, []);
 
+  const homeHref = account?.role === "Resident" ? "/dashboard" :
+    account?.role === "Administrator" ? "/admin" : account ? "/staff" : "/";
+
   return (
     <AuthShell eyebrow="Your account" title={account ? `Welcome, ${account.name}` : "Account"}
-      description="Your secure Smart Community session.">
+      description="Your secure Smart Community session." homeHref={homeHref}
+      homeLabel={account ? "Back to dashboard" : "Back to home"}>
       <div className="logout-card">
         {account ? (
           <>
@@ -38,20 +41,20 @@ export default function AccountPage() {
             <p>Role: {account.role}</p>
             {account.role === "Resident" ? <>
               <p>Create a new community report or review issues already submitted from this account.</p>
-              <div className="logout-actions"><Link className="button button-primary" href="/dashboard">Dashboard</Link><Link className="button button-secondary" href="/reports/new">New report</Link><Link className="button button-secondary" href="/reports">My reports</Link></div>
+              <div className="logout-actions"><a className="button button-primary" href="/dashboard">Dashboard</a><a className="button button-secondary" href="/reports/new">New report</a><a className="button button-secondary" href="/reports">My reports</a></div>
             </> : account.role === "Administrator" ? <>
               <p>Manage users, roles, report categories, approved settings, and administrative audit records.</p>
-              <div className="logout-actions"><Link className="button button-primary" href="/admin">Administration</Link><Link className="button button-secondary" href="/staff">Staff dashboard</Link></div>
+              <div className="logout-actions"><a className="button button-primary" href="/admin">Administration</a><a className="button button-secondary" href="/staff">Staff dashboard</a></div>
             </> : <>
               <p>Open the council operations workspace to review, prioritise, assign, and progress community reports.</p>
-              <div className="logout-actions"><Link className="button button-primary" href="/staff">Staff dashboard</Link><Link className="button button-secondary" href="/staff/reports">Report queue</Link></div>
+              <div className="logout-actions"><a className="button button-primary" href="/staff">Staff dashboard</a><a className="button button-secondary" href="/staff/reports">Report queue</a></div>
             </>}
-            <Link className="button button-secondary account-signout" href="/logout">Sign out</Link>
+            <a className="button button-secondary account-signout" href="/logout">Sign out</a>
           </>
         ) : (
           <>
             <p role="status">{status}</p>
-            <Link className="button button-primary" href="/login">Sign in</Link>
+            <a className="button button-primary" href="/login">Sign in</a>
           </>
         )}
       </div>

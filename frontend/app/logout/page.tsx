@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { AuthShell } from "../_components/AuthShell";
 import { apiFetch } from "../_lib/api";
 
@@ -32,7 +31,7 @@ export default function LogoutPage() {
           <>
             <h2>Session ended</h2>
             <p>You can sign in again whenever you need to view your account.</p>
-            <Link className="button button-primary" href="/">Return to homepage</Link>
+            <a className="button button-primary" href="/">Return to homepage</a>
           </>
         ) : (
           <>
@@ -40,7 +39,7 @@ export default function LogoutPage() {
             <p>Your account will remain available when you sign in again.</p>
             <div className="logout-actions">
               <button className="button button-dark" type="button" onClick={signOut} disabled={busy}>{busy ? "Signing out..." : "Confirm sign out"}</button>
-              <Link className="button button-secondary" href="/">Keep browsing</Link>
+              <a className="button button-secondary" href="/">Keep browsing</a>
             </div>
             {message && <p role="status">{message}</p>}
           </>

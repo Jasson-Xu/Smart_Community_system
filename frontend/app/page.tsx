@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import Link from "next/link";
 
 const categories = [
   { name: "Roads & footpaths", detail: "Potholes, cracks and access hazards", mark: "RF", slug: "roads-footpaths" },
@@ -75,9 +74,9 @@ export default function Home() {
             Report a problem in minutes, follow every update, and help council teams respond with the right information from the start.
           </p>
         <div className="hero-actions">
-            <Link className="button button-primary" href="/reports/new">
+            <a className="button button-primary" href="/reports/new">
               Report an issue <span aria-hidden="true">→</span>
-            </Link>
+            </a>
             <a className="button button-secondary" href="#track">Track a report</a>
           </div>
           <p className="account-prompt">Want to keep all your reports together? <a href="/register">Create a resident account</a></p>
@@ -123,18 +122,18 @@ export default function Home() {
             <p className="eyebrow">Start with the issue</p>
             <h2>What would you like to report?</h2>
           </div>
-          <Link className="link-button" href="/reports/new">View all categories →</Link>
+          <a className="link-button" href="/reports/new">View all categories →</a>
         </div>
         <div className="category-grid">
           {categories.map((category) => (
-            <Link className="category-card" href={`/reports/new?category=${category.slug}`} key={category.name}>
+            <a className="category-card" href={`/reports/new?category=${category.slug}`} key={category.name}>
               <span className="category-mark" aria-hidden="true">{category.mark}</span>
               <span>
                 <strong>{category.name}</strong>
                 <small>{category.detail}</small>
               </span>
               <b aria-hidden="true">↗</b>
-            </Link>
+            </a>
           ))}
         </div>
       </section>
