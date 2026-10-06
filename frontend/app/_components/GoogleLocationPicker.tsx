@@ -24,7 +24,7 @@ type AdvancedMarker = {
 };
 type GeocoderResult = { formatted_address?: string; place_id?: string };
 type GoogleGeocoder = {
-  geocode(request: { location: { lat: number; lng: number } }): Promise<{ results: GeocoderResult[] }>;
+  geocode(request: { location: { lat: number; lng: number }; language?: string }): Promise<{ results: GeocoderResult[] }>;
 };
 type GooglePlace = {
   id?: string;
@@ -57,7 +57,7 @@ function loadGoogleMaps(apiKey: string) {
     const script = document.createElement("script");
     script.id = "smart-community-google-maps";
     script.async = true;
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&loading=async&callback=smartCommunityGoogleMapsReady&v=weekly`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&loading=async&callback=smartCommunityGoogleMapsReady&v=weekly&language=en`;
     script.onerror = () => reject(new Error("Google Maps could not be loaded."));
     document.head.appendChild(script);
   });
@@ -128,7 +128,7 @@ export function GoogleLocationPicker({ value, latitude, longitude, invalid, onCh
           googlePlaceId: null,
         });
         try {
-          const { results } = await geocoder.geocode({ location: position });
+          const { results } = await geocoder.geocode({ location: position, language: "en" });
           if (disposed || sequence !== reverseGeocodeSequence) return;
           const closestAddress = results[0];
           onChangeRef.current({
