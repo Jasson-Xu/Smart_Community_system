@@ -10,7 +10,9 @@ The system supports concerns affecting public infrastructure, environmental qual
 
 **Public URL:** [https://15-135-238-18.sslip.io/](https://15-135-238-18.sslip.io/)
 
-The hosted demo runs on Amazon Linux 2023. Caddy serves HTTPS and forwards requests to the React frontend and ASP.NET Core API. PostgreSQL runs on the same EC2 instance. The frontend, API, database, and Caddy services are running, and the public homepage and sign-in page respond successfully. Amazon RDS and S3 are not connected to this deployment; photograph uploads remain deferred.
+The hosted demo runs on Amazon Linux 2023. Caddy serves HTTPS and forwards requests to the React frontend and ASP.NET Core API. PostgreSQL runs on the same EC2 instance. The frontend, API, database, and Caddy services are running, and the public homepage and sign-in page respond successfully. Amazon RDS is not connected to this deployment.
+
+The developer has decided to postpone Amazon S3 integration and deployment because of the project's workload and limited familiarity with S3. Photograph uploads are therefore unavailable in the hosted demo for now.
 
 ## Online demo accounts
 
