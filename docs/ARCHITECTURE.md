@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document records the target architecture for the Smart Community System. It describes intended boundaries rather than claiming that components have already been implemented.
+This document records the target architecture for the Smart Community System. The Week 4 API and identity database are implemented; report processing, photograph storage, and AWS deployment remain target components.
 
 ## System context
 

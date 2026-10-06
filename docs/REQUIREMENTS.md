@@ -37,6 +37,10 @@ Provide a secure and accessible service through which residents can submit struc
 | FR-21 | The system shall allow administrators to manage issue categories. |
 | FR-22 | The system shall provide basic dashboard statistics. |
 | FR-23 | The system shall record important activities in an audit log. |
+| FR-24 | The system shall flag potential duplicate reports for authorised staff review without automatically discarding a resident submission. |
+| FR-25 | The system shall allow administrators to manage documented, non-secret operational settings. |
+
+FR-24 and FR-25 make explicit two functions described in the proposal narrative but not included in its numbered 1-23 requirement table. Their detailed rules and acceptance tests will be defined before Weeks 8 and 9 respectively.
 
 ## Non-functional requirements
 

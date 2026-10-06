@@ -1,7 +1,9 @@
+import Link from "next/link";
+
 export default function SecurityPage() {
   return (
     <main className="policy-page">
-      <a className="policy-back" href="/">← Smart Community</a>
+      <Link className="policy-back" href="/">← Smart Community</Link>
       <header>
         <p className="eyebrow">Responsible development</p>
         <h1>Security is part of the service.</h1>
@@ -17,7 +19,7 @@ export default function SecurityPage() {
         <section><h2>Photograph safety</h2><p>Uploads must be restricted by file type and size, inspected before use, stored with private permissions, and accessed through authorised, time-limited links where appropriate.</p></section>
         <section><h2>Safe development</h2><p>Developers must use synthetic test data, keep secrets out of Git, review dependencies, and avoid logging tokens, private locations, or unnecessary personal information.</p></section>
       </div>
-      <footer className="policy-footer"><a href="/">Return to the homepage</a><span>Latest development version</span></footer>
+      <footer className="policy-footer"><Link href="/">Return to the homepage</Link><span>Latest development version</span></footer>
     </main>
   );
 }

@@ -93,6 +93,7 @@ export default function Home() {
               Report an issue <span aria-hidden="true">→</span>
             </a>
             <a className="button button-secondary" href="#track">Track a report</a>
+            <button className="button button-secondary" type="button" onClick={openReport}>Preview report form</button>
           </div>
           <p className="account-prompt">Want to keep all your reports together? <a href="/register">Create a resident account</a></p>
           <div className="hero-assurance" aria-label="Service highlights">
@@ -238,13 +239,14 @@ export default function Home() {
       </footer>
 
       {reportOpen && (
-        <div className="modal-backdrop" role="presentation" onMouseDown={() => setReportOpen(false)}>
+        <div className="modal-backdrop" role="presentation" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) setReportOpen(false);
+        }}>
           <section
             className="report-modal"
             role="dialog"
             aria-modal="true"
             aria-labelledby="report-title"
-            onMouseDown={(event) => event.stopPropagation()}
           >
             <button className="modal-close" type="button" aria-label="Close report form" onClick={() => setReportOpen(false)}>×</button>
             {!submitted ? (
@@ -264,7 +266,7 @@ export default function Home() {
                 <span aria-hidden="true">✓</span>
                 <p className="eyebrow">Prototype complete</p>
                 <h2 id="report-title">The reporting flow is ready for the API.</h2>
-                <p>No information was saved. The next build stage will connect validation, authentication, and secure persistence.</p>
+                <p>No report information was saved. The next build stage will connect report validation and secure persistence.</p>
                 <button className="button button-dark" type="button" onClick={() => setReportOpen(false)}>Return home</button>
               </div>
             )}

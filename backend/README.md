@@ -1,0 +1,68 @@
+# Smart Community API
+
+The Week 4 API provides PostgreSQL-backed resident registration, login, logout, session lookup, and role-protected staff and administrator session endpoints. Public registration always creates a resident account. Staff and administrator accounts can only be provisioned by an operator with database access.
+
+## Local setup
+
+Prerequisites: .NET 10 SDK, Docker with Compose, and Node.js 22.13 or later for the frontend. Use synthetic account details only.
+
+1. Copy the repository's `.env.example` to `.env` and replace the local PostgreSQL password. The `.env` file is ignored by Git.
+2. From the repository root, run `docker compose up -d postgres` and wait until the container is healthy.
+3. Set the API connection string in your shell. In PowerShell:
+
+   ```powershell
+   $env:ConnectionStrings__Default = 'Host=localhost;Port=5432;Database=smartcommunity;Username=smartcommunity;Password=<your local password>'
+   ```
+
+4. Run the migration and start the API:
+
+   ```powershell
+   dotnet ef database update --project backend/SmartCommunity.Api
+   dotnet run --project backend/SmartCommunity.Api --launch-profile http
+   ```
+
+   The development API listens on `http://localhost:5079`. Set `Frontend__Origin` if the frontend uses a different origin from `http://localhost:3000`.
+   Development cookie-protection keys are stored in the ignored `.docker-data/data-protection-keys/` directory so local sessions survive an API restart. Protect and back up the key ring appropriately before production deployment.
+5. In a second shell, copy `frontend/.env.example` to `frontend/.env.local`, then run `npm ci` and `npm run dev` in `frontend/`.
+
+## Endpoints
+
+| Method | Path | Access | Result |
+| --- | --- | --- | --- |
+| GET | `/health` | Public | API process health |
+| POST | `/api/v1/auth/register` | Public | Create resident and sign in |
+| POST | `/api/v1/auth/login` | Public | Sign in |
+| POST | `/api/v1/auth/logout` | Public | End browser session |
+| GET | `/api/v1/auth/me` | Signed in | Current account |
+| GET | `/api/v1/staff/me` | Staff or administrator | Role check |
+| GET | `/api/v1/admin/me` | Administrator | Role check |
+
+The browser sends credentials with requests. POST requests must include `X-Requested-With: XMLHttpRequest`; browser requests with an `Origin` header must match `Frontend:Origin`. The API accepts credentialed CORS requests only from that origin. Registration and login are limited to ten requests per minute per client IP. Cookies are HttpOnly and secure in non-development environments. Production must place the frontend and API on the same site and use HTTPS.
+
+## Provisioning staff and administrators
+
+After the migration, supply `Bootstrap__Name`, `Bootstrap__Email`, `Bootstrap__Password`, and `Bootstrap__Role` as environment variables. The role must be `Staff` or `Administrator`. In PowerShell, read the password without placing it in shell history: `$env:Bootstrap__Password = [System.Net.NetworkCredential]::new('', (Read-Host 'Bootstrap password' -AsSecureString)).Password`. Then run:
+
+```powershell
+dotnet run --project backend/SmartCommunity.Api --launch-profile http -- --bootstrap-role
+```
+
+The command creates one account and refuses to modify an existing one. Clear the bootstrap environment variables afterward. Do not put passwords in command arguments, committed files, or shell history. User and role management through the API is planned for Week 9.
+
+## Local demo accounts
+
+After applying the migration, run `pwsh -File scripts/seed-demo-accounts.ps1` from the repository root. This explicit, Development-only command creates or refreshes three synthetic accounts:
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Resident | `resident.demo@example.test` | `DemoPass123!` |
+| Staff | `staff.demo@example.test` | `DemoPass123!` |
+| Administrator | `admin.demo@example.test` | `DemoPass123!` |
+
+The local login page also displays these credentials. All three roles currently reach the account page; staff and administrator dashboards are planned for later weeks. The seed command refuses to run outside Development.
+
+## Verification
+
+Run `dotnet build backend/SmartCommunity.Api` and `pwsh -File scripts/smoke-auth.ps1` after the database and API are running. The smoke test creates a synthetic resident, checks session and role protection, logs out, and checks that the session is gone. It requires no privileged account.
+
+The API does not yet implement report submission, staff reports, photo storage, or account recovery. Those are scheduled in later weeks.

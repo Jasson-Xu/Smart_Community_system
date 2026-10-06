@@ -5,12 +5,13 @@ The resident-facing website for the Smart Community System. This first implement
 - a responsive civic-service homepage;
 - an interactive issue-reporting prototype;
 - a report-tracking preview;
-- registration, login, and logout interface flows with client-side validation;
+- registration, login, and logout flows connected to the ASP.NET Core API;
+- an authenticated account page;
 - issue categories, status examples, and community metrics;
 - public privacy and security information; and
 - production-build and rendered-route tests.
 
-All displayed reports and statistics are illustrative. Authentication pages do not create accounts or sessions. The frontend does not yet connect to the ASP.NET Core API, PostgreSQL, or production storage.
+All displayed reports and statistics are illustrative. Account data is stored by the API in local PostgreSQL when the backend is running. Report submission, report tracking, and production photograph storage are not connected yet. Use synthetic data only.
 
 ## Requirements
 
@@ -25,6 +26,8 @@ npm run dev
 ```
 
 Open `http://localhost:3000`.
+
+Copy `.env.example` to `.env.local` to set `NEXT_PUBLIC_API_BASE_URL`. Start the PostgreSQL database and API first using the [backend guide](../backend/README.md).
 
 ## Verification
 
@@ -41,8 +44,10 @@ npm test
 - `app/register/page.tsx` — resident registration form and validation
 - `app/login/page.tsx` — login form and validation
 - `app/logout/page.tsx` — logout confirmation states
+- `app/account/page.tsx` — authenticated account session
+- `app/_lib/api.ts` — credentialed API requests
 - `app/globals.css` — design system, responsive layout, and accessibility states
 - `public/og.png` — site-specific social preview card
 - `tests/` — rendered HTML and design-token checks
 
-The production backend remains planned as ASP.NET Core Web API with PostgreSQL. No D1, R2, application-owned authentication, or persistent browser storage is enabled in this frontend stage.
+The backend now uses ASP.NET Core Web API and PostgreSQL for identity. Browser sessions use an HttpOnly cookie issued by the API. No D1, R2, or persistent browser token storage is used.

@@ -52,33 +52,37 @@ test("server-renders public privacy and security pages", async () => {
   assert.match(await securityResponse.text(), /Security is part of the service\./);
 });
 
-test("server-renders registration, login, and logout pages", async () => {
-  const [registrationResponse, loginResponse, logoutResponse] = await Promise.all([
+test("server-renders registration, login, logout, and account pages", async () => {
+  const [registrationResponse, loginResponse, logoutResponse, accountResponse] = await Promise.all([
     render("/register"),
     render("/login"),
     render("/logout"),
+    render("/account"),
   ]);
 
   assert.equal(registrationResponse.status, 200);
   assert.equal(loginResponse.status, 200);
   assert.equal(logoutResponse.status, 200);
+  assert.equal(accountResponse.status, 200);
 
-  const [registrationHtml, loginHtml, logoutHtml] = await Promise.all([
+  const [registrationHtml, loginHtml, logoutHtml, accountHtml] = await Promise.all([
     registrationResponse.text(),
     loginResponse.text(),
     logoutResponse.text(),
+    accountResponse.text(),
   ]);
 
   assert.match(registrationHtml, /Create your account/);
   assert.match(registrationHtml, /Create an account to get started/);
-  assert.match(registrationHtml, /Registration is not connected to a database yet\./);
+  assert.match(registrationHtml, /Use test details only/);
   assert.match(registrationHtml, /name="confirmPassword"/);
   assert.match(loginHtml, /Sign in to your account/);
   assert.match(loginHtml, /Sign in to get started/);
   assert.match(loginHtml, /Sign in to start using the system and submit your report\./);
   assert.match(loginHtml, /name="password"/);
   assert.match(logoutHtml, /Ready to sign out\?/);
-  assert.match(logoutHtml, /No authentication cookie, token, or server session exists yet\./);
+  assert.match(logoutHtml, /Confirm sign out/);
+  assert.match(accountHtml, /Loading account/);
 });
 
 test("uses the approved palette and production metadata", async () => {

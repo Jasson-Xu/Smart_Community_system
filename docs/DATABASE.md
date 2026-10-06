@@ -1,6 +1,8 @@
 # Proposed Database Design
 
-This document defines the proposed PostgreSQL data model for the backend phase of the Smart Community System. It is derived from the current requirements and architecture documents; it does not claim that the database or API has already been implemented.
+This document defines the target PostgreSQL data model for the Smart Community System. The Week 4 identity migration currently creates `users` only. Reporting and workflow tables are scheduled for later weeks.
+
+The initial `users` table has a single `role` column so the first API can enforce Resident, Staff, and Administrator access. The target `roles` and `user_roles` tables below remain a later design step; migration to those tables must preserve existing account roles.
 
 ## Design goals
 

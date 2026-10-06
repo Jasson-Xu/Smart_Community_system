@@ -252,6 +252,7 @@ footer { width: min(1180px, calc(100% - 48px)); min-height: 170px; margin: 0 aut
 .auth-panel header > p:last-child { max-width: 470px; margin: 19px 0 0; color: var(--slate); font-size: 15px; line-height: 1.65; }
 .auth-notice { display: flex; align-items: center; gap: 12px; margin: 30px 0 25px; padding: 11px 13px; border-left: 3px solid var(--clay); background: rgba(171,151,140,.12); color: var(--charcoal); font-size: 11px; line-height: 1.45; }
 .auth-notice strong { flex: 0 0 auto; padding: 3px 7px; border-radius: 99px; background: var(--clay); color: var(--white); font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }
+.demo-account-notice { align-items: flex-start; flex-direction: column; gap: 5px; overflow-wrap: anywhere; }
 .auth-form { display: grid; grid-template-columns: 1fr; }
 .auth-form > label:not(.checkbox-row), .label-row label { margin: 15px 0 8px; color: var(--charcoal); font-size: 12px; font-weight: 760; }
 .auth-form > input { width: 100%; min-height: 52px; padding: 0 15px; border: 1px solid rgba(94,86,83,.24); border-radius: 8px; background: var(--white); color: var(--ink); transition: border .18s ease, box-shadow .18s ease; }

@@ -8,6 +8,10 @@ The project intends to follow [Semantic Versioning](https://semver.org/) when ve
 
 ### Added
 
+- Week 4 ASP.NET Core API with PostgreSQL identity migration, password hashing, cookie sessions, role checks, and operator-only role account bootstrap.
+- Connected frontend registration, login, logout, and account session page.
+- Local PostgreSQL Compose configuration and authentication smoke test.
+- Development-only demo accounts for resident, staff, and administrator review.
 - Professional repository documentation and governance baseline.
 - Project requirements, architecture, and 12-week delivery roadmap.
 - Privacy, security, contribution, conduct, and licensing policies.

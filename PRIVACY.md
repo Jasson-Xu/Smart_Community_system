@@ -81,7 +81,7 @@ Do not post personal information or privacy requests in a public GitHub issue.
 
 ## 10. Cookies and analytics
 
-The repository does not currently implement advertising or behavioural analytics. Essential authentication or security storage may be introduced as the application is developed. Any analytics, non-essential cookies, or third-party tracking must be documented here and presented to users with appropriate controls before activation.
+The repository does not currently implement advertising or behavioural analytics. The development API uses an HttpOnly session cookie for signed-in accounts. Any analytics, non-essential cookies, or third-party tracking must be documented here and presented to users with appropriate controls before activation.
 
 ## 11. Data incidents
 

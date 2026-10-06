@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { AuthShell } from "../_components/AuthShell";
+import { apiFetch, errorMessage } from "../_lib/api";
 
 type RegistrationErrors = {
   name?: string;
@@ -15,8 +16,9 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState<RegistrationErrors>({});
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  function submitRegistration(event: FormEvent<HTMLFormElement>) {
+  async function submitRegistration(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const name = String(form.get("name") ?? "").trim();
@@ -35,14 +37,31 @@ export default function RegisterPage() {
     if (!consent) nextErrors.consent = "Confirm that you have read the privacy information.";
 
     setErrors(nextErrors);
-    setMessage(Object.keys(nextErrors).length === 0
-      ? "The registration page is ready for API integration. No account was created and no information was saved."
-      : "Please correct the highlighted fields.");
+    if (Object.keys(nextErrors).length) {
+      setMessage("Please correct the highlighted fields.");
+      return;
+    }
+    setBusy(true);
+    setMessage("");
+    try {
+      const response = await apiFetch("/auth/register", {
+        method: "POST", body: JSON.stringify({ name, email, password }),
+      });
+      if (!response.ok) {
+        setMessage(await errorMessage(response, "Account creation failed. Please try again."));
+        return;
+      }
+      window.location.assign("/account");
+    } catch {
+      setMessage("The account service is unavailable. Please try again later.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
     <AuthShell eyebrow="Resident registration" title="Create your account" description="Set up one place to submit issues and follow their progress." asideMessage="Create an account to get started">
-      <div className="auth-notice"><strong>UI preview</strong><span>Registration is not connected to a database yet.</span></div>
+      <div className="auth-notice"><strong>Development prototype</strong><span>Use test details only. Do not enter real personal information.</span></div>
       <form className="auth-form" onSubmit={submitRegistration} noValidate>
         <label htmlFor="register-name">Full name</label>
         <input id="register-name" name="name" autoComplete="name" placeholder="Your full name" aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? "register-name-error" : undefined} />
@@ -60,10 +79,10 @@ export default function RegisterPage() {
         <input id="register-confirm-password" name="confirmPassword" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="Repeat your password" aria-invalid={Boolean(errors.confirmPassword)} aria-describedby={errors.confirmPassword ? "register-confirm-error" : undefined} />
         {errors.confirmPassword && <p className="field-error" id="register-confirm-error">{errors.confirmPassword}</p>}
 
-        <label className="checkbox-row"><input name="consent" type="checkbox" aria-invalid={Boolean(errors.consent)} /><span>I have read the <a href="/privacy">privacy information</a> and understand this is a prototype.</span></label>
+        <label className="checkbox-row"><input name="consent" type="checkbox" aria-invalid={Boolean(errors.consent)} /><span>I have read the <a href="/privacy">privacy information</a> and understand this is a development prototype.</span></label>
         {errors.consent && <p className="field-error">{errors.consent}</p>}
 
-        <button className="button button-primary auth-submit" type="submit">Create account <span aria-hidden="true">→</span></button>
+        <button className="button button-primary auth-submit" type="submit" disabled={busy}>{busy ? "Creating account..." : "Create account"} <span aria-hidden="true">→</span></button>
         {message && <p className="auth-message" role="status">{message}</p>}
       </form>
       <p className="auth-switch">Already have an account? <a href="/login">Sign in</a></p>

@@ -1,7 +1,9 @@
+import Link from "next/link";
+
 export default function PrivacyPage() {
   return (
     <main className="policy-page">
-      <a className="policy-back" href="/">← Smart Community</a>
+      <Link className="policy-back" href="/">← Smart Community</Link>
       <header>
         <p className="eyebrow">Public information</p>
         <h1>Privacy at Smart Community</h1>
@@ -19,7 +21,7 @@ export default function PrivacyPage() {
         <section><h2>Retention and your choices</h2><p>Production retention periods are not yet defined. A deployed service must provide private ways to request access, correction, or deletion where applicable and retain information only for a documented purpose.</p></section>
         <section><h2>Questions or incidents</h2><p>Do not post personal information in a public GitHub issue. A private privacy contact and incident-response process must be published before the prototype accepts real reports.</p></section>
       </div>
-      <footer className="policy-footer"><a href="/">Return to the homepage</a><span>Effective 14 August 2026</span></footer>
+      <footer className="policy-footer"><Link href="/">Return to the homepage</Link><span>Effective 14 August 2026</span></footer>
     </main>
   );
 }

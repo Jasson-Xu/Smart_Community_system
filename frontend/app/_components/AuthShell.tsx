@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 
 type AuthShellProps = {
   eyebrow: string;
@@ -12,10 +13,10 @@ export function AuthShell({ eyebrow, title, description, asideMessage, children 
   return (
     <main className="auth-page">
       <section className="auth-aside">
-        <a className="auth-brand" href="/" aria-label="Smart Community home">
+        <Link className="auth-brand" href="/" aria-label="Smart Community home">
           <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
           <span><strong>Smart Community</strong><small>Local issues, clearly managed</small></span>
-        </a>
+        </Link>
         {asideMessage ? (
           <div className="auth-aside-simple">
             <h2>{asideMessage}</h2>
@@ -32,14 +33,14 @@ export function AuthShell({ eyebrow, title, description, asideMessage, children 
               <li><span>02</span><div><strong>Visible progress</strong><small>See each step from review to resolution.</small></div></li>
               <li><span>03</span><div><strong>Privacy by design</strong><small>Only necessary information should be collected.</small></div></li>
             </ol>
-            <p className="auth-prototype-label">Frontend prototype · No account data is stored</p>
+            <p className="auth-prototype-label">Development prototype · Use synthetic data only</p>
           </>
         )}
       </section>
 
       <section className="auth-main">
         <div className="auth-panel">
-          <a className="auth-back" href="/">← Back to home</a>
+          <Link className="auth-back" href="/">← Back to home</Link>
           <header>
             <p className="eyebrow">{eyebrow}</p>
             <h1>{title}</h1>

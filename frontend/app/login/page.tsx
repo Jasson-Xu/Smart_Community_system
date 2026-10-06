@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { AuthShell } from "../_components/AuthShell";
+import { apiFetch, errorMessage } from "../_lib/api";
 
 type LoginErrors = { email?: string; password?: string };
 
@@ -9,8 +10,9 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<LoginErrors>({});
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  function submitLogin(event: FormEvent<HTMLFormElement>) {
+  async function submitLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const email = String(form.get("email") ?? "").trim();
@@ -21,14 +23,41 @@ export default function LoginPage() {
     if (!password) nextErrors.password = "Enter your password.";
 
     setErrors(nextErrors);
-    setMessage(Object.keys(nextErrors).length === 0
-      ? "The login page is ready for API integration. No session was created and no information was sent."
-      : "Please correct the highlighted fields.");
+    if (Object.keys(nextErrors).length) {
+      setMessage("Please correct the highlighted fields.");
+      return;
+    }
+    setBusy(true);
+    setMessage("");
+    try {
+      const response = await apiFetch("/auth/login", {
+        method: "POST", body: JSON.stringify({ email, password }),
+      });
+      if (!response.ok) {
+        setMessage(response.status === 401 ? "Email or password is incorrect." :
+          await errorMessage(response, "Sign in failed. Please try again."));
+        return;
+      }
+      window.location.assign("/account");
+    } catch {
+      setMessage("The account service is unavailable. Please try again later.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
     <AuthShell eyebrow="Welcome back" title="Sign in to your account" description="Continue to your reports and council updates." asideMessage="Sign in to get started">
       <div className="auth-notice"><strong>Sign in required</strong><span>Sign in to start using the system and submit your report.</span></div>
+      {process.env.NODE_ENV === "development" && (
+        <div className="auth-notice demo-account-notice">
+          <strong>Local demo accounts</strong>
+          <span>Resident: resident.demo@example.test</span>
+          <span>Staff: staff.demo@example.test</span>
+          <span>Administrator: admin.demo@example.test</span>
+          <span>Password for all three: DemoPass123!</span>
+        </div>
+      )}
       <form className="auth-form" onSubmit={submitLogin} noValidate>
         <label htmlFor="login-email">Email address</label>
         <input id="login-email" name="email" type="email" autoComplete="email" placeholder="you@example.com" aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "login-email-error" : undefined} />
@@ -38,8 +67,7 @@ export default function LoginPage() {
         <input id="login-password" name="password" type={showPassword ? "text" : "password"} autoComplete="current-password" placeholder="Enter your password" aria-invalid={Boolean(errors.password)} aria-describedby={errors.password ? "login-password-error" : undefined} />
         {errors.password && <p className="field-error" id="login-password-error">{errors.password}</p>}
 
-        <label className="checkbox-row"><input name="remember" type="checkbox" /><span>Remember my email on this device when supported</span></label>
-        <button className="button button-primary auth-submit" type="submit">Sign in <span aria-hidden="true">→</span></button>
+        <button className="button button-primary auth-submit" type="submit" disabled={busy}>{busy ? "Signing in..." : "Sign in"} <span aria-hidden="true">→</span></button>
         {message && <p className="auth-message" role="status">{message}</p>}
       </form>
       <p className="auth-switch">New to Smart Community? <a href="/register">Create an account</a></p>
