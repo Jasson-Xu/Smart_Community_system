@@ -10,6 +10,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<ReportStatus> ReportStatuses => Set<ReportStatus>();
     public DbSet<CommunityReport> Reports => Set<CommunityReport>();
     public DbSet<StatusHistoryEntry> StatusHistory => Set<StatusHistoryEntry>();
+    public DbSet<ReportComment> Comments => Set<ReportComment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -91,6 +92,20 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             .OnDelete(DeleteBehavior.Restrict);
         history.Property(entry => entry.Note).HasColumnName("note").HasMaxLength(500);
         history.Property(entry => entry.ChangedAt).HasColumnName("changed_at").IsRequired();
+
+        var comments = modelBuilder.Entity<ReportComment>();
+        comments.ToTable("comments");
+        comments.HasKey(comment => comment.Id);
+        comments.Property(comment => comment.Id).HasColumnName("id");
+        comments.Property(comment => comment.ReportId).HasColumnName("report_id");
+        comments.HasOne(comment => comment.Report).WithMany().HasForeignKey(comment => comment.ReportId)
+            .OnDelete(DeleteBehavior.Cascade);
+        comments.HasIndex(comment => new { comment.ReportId, comment.CreatedAt });
+        comments.Property(comment => comment.AuthorId).HasColumnName("author_id");
+        comments.HasOne(comment => comment.Author).WithMany().HasForeignKey(comment => comment.AuthorId)
+            .OnDelete(DeleteBehavior.Restrict);
+        comments.Property(comment => comment.Body).HasColumnName("body").HasMaxLength(1000).IsRequired();
+        comments.Property(comment => comment.CreatedAt).HasColumnName("created_at").IsRequired();
 
         categories.HasData(
             new IssueCategory { Id = Guid.Parse("3f8d8599-7bbd-4f05-a915-7196b552f001"), Slug = "roads-footpaths", Name = "Roads & footpaths", Description = "Potholes, cracks and access hazards", SortOrder = 10 },

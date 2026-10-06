@@ -48,3 +48,14 @@ public sealed class StatusHistoryEntry
     public string? Note { get; set; }
     public DateTimeOffset ChangedAt { get; set; }
 }
+
+public sealed class ReportComment
+{
+    public Guid Id { get; set; }
+    public Guid ReportId { get; set; }
+    public CommunityReport Report { get; set; } = null!;
+    public Guid AuthorId { get; set; }
+    public AppUser Author { get; set; } = null!;
+    public string Body { get; set; } = "";
+    public DateTimeOffset CreatedAt { get; set; }
+}

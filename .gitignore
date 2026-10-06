@@ -64,7 +64,7 @@ crash.log
 
 # Generated documentation and reports
 artifacts/
-reports/
+/reports/
 *.ppt
 *.pptx
 docs/diagrams/

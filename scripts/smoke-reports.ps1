@@ -62,12 +62,31 @@ if ($second.reference -eq $created.reference) { throw 'Report references are not
 $listResponse = Invoke-Checked 200 { Invoke-WebRequest "$BaseUrl/api/v1/reports" -WebSession $owner -SkipHttpErrorCheck }
 $reports = $listResponse.Content | ConvertFrom-Json
 if ($reports.Count -ne 2 -or $reports.reference -notcontains $created.reference) { throw 'Resident report list is incomplete.' }
+$dashboardResponse = Invoke-Checked 200 { Invoke-WebRequest "$BaseUrl/api/v1/resident/dashboard" -WebSession $owner -SkipHttpErrorCheck }
+$dashboard = $dashboardResponse.Content | ConvertFrom-Json
+$submittedCount = ($dashboard.statusCounts | Where-Object { $_.code -eq 'SUBMITTED' }).count
+if ($dashboard.totalReports -ne 2 -or $dashboard.recentReports.Count -ne 2 -or $submittedCount -ne 2) {
+  throw 'Resident dashboard totals are incorrect.'
+}
+$filteredResponse = Invoke-Checked 200 { Invoke-WebRequest "$BaseUrl/api/v1/reports?status=SUBMITTED&sort=oldest" -WebSession $owner -SkipHttpErrorCheck }
+$filtered = $filteredResponse.Content | ConvertFrom-Json
+if ($filtered.Count -ne 2 -or $filtered[0].statusCode -ne 'SUBMITTED') { throw 'Report filtering or sorting failed.' }
 $detailResponse = Invoke-Checked 200 { Invoke-WebRequest "$BaseUrl/api/v1/reports/$($created.reference)" -WebSession $owner -SkipHttpErrorCheck }
 $detail = $detailResponse.Content | ConvertFrom-Json
 if ($detail.latitude -ne -33.873138 -or $detail.longitude -ne 151.211275 -or $detail.googlePlaceId -ne 'ChIJ5UHvz0GuEmsR5rN_H74uZZs') {
   throw 'Google Maps location metadata was not persisted in report detail.'
 }
 Invoke-Checked 404 { Invoke-WebRequest "$BaseUrl/api/v1/reports/$($created.reference)" -WebSession $otherResident -SkipHttpErrorCheck } | Out-Null
+$invalidComment = @{ body = ' ' } | ConvertTo-Json
+Invoke-Checked 400 { Invoke-WebRequest "$BaseUrl/api/v1/reports/$($created.reference)/comments" -Method Post -Headers $headers -ContentType 'application/json' -Body $invalidComment -WebSession $owner -SkipHttpErrorCheck } | Out-Null
+$validComment = @{ body = 'The obstruction is still present near the accessible entrance.' } | ConvertTo-Json
+$commentResponse = Invoke-Checked 201 { Invoke-WebRequest "$BaseUrl/api/v1/reports/$($created.reference)/comments" -Method Post -Headers $headers -ContentType 'application/json' -Body $validComment -WebSession $owner -SkipHttpErrorCheck }
+$comment = $commentResponse.Content | ConvertFrom-Json
+if ($comment.body -notmatch 'still present' -or -not $comment.authorName) { throw 'Created comment response is incomplete.' }
+$commentsResponse = Invoke-Checked 200 { Invoke-WebRequest "$BaseUrl/api/v1/reports/$($created.reference)/comments" -WebSession $owner -SkipHttpErrorCheck }
+$comments = $commentsResponse.Content | ConvertFrom-Json
+if ($comments.Count -ne 1 -or $comments[0].id -ne $comment.id) { throw 'Comment list is incomplete.' }
+Invoke-Checked 404 { Invoke-WebRequest "$BaseUrl/api/v1/reports/$($created.reference)/comments" -WebSession $otherResident -SkipHttpErrorCheck } | Out-Null
 
 $staff = New-Object Microsoft.PowerShell.Commands.WebRequestSession
 $staffLogin = @{ email = 'staff.demo@example.test'; password = 'DemoPass123!' } | ConvertTo-Json

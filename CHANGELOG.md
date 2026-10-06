@@ -8,6 +8,8 @@ The project intends to follow [Semantic Versioning](https://semver.org/) when ve
 
 ### Added
 
+- Week 7 resident dashboard with per-status totals and recent reports.
+- Resident report status filtering, sorting, chronological comments, and ownership enforcement.
 - Week 5 report categories, lifecycle statuses, report persistence, unique references, and initial status history.
 - Google Maps place autocomplete and map-pin selection with persisted coordinates and Place ID.
 - Resident report form with review and confirmation, owned report list, and report detail page.

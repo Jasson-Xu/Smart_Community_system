@@ -4,7 +4,7 @@ This roadmap prioritises a secure, demonstrable core workflow for an individual 
 
 Each week ends with a review of the implemented code, documentation, and verification results. Work on the following week begins after the project owner confirms the current week's result. The project owner handles Git commits and pushes.
 
-> **Current progress:** Week 5 implementation and local verification are complete, awaiting project-owner confirmation. Residents can submit validated reports, receive unique references, and view their own report list, details, status, and initial history. Photograph upload remains scheduled for Week 6.
+> **Current progress:** Week 7 implementation and local verification are complete, awaiting project-owner confirmation. Residents now have a database-backed dashboard, status filtering and sorting, report timelines, and ownership-protected comments. Week 6 photograph handling was deferred by the project owner and remains in the backlog.
 
 | Week | Focus | Expected outcome |
 | --- | --- | --- |
@@ -47,3 +47,12 @@ Optional functions should be deferred before any essential privacy, security, ac
 - Confirm one resident cannot read another resident's report and staff accounts cannot use resident report endpoints.
 - Run `dotnet build`, `npm test`, `npm run lint`, TypeScript checking, and `scripts/smoke-reports.ps1`.
 - Review the [Week 5 implementation notes](WEEK_05.md) and confirm the week before starting Week 6.
+
+## Week 7 acceptance gate
+
+- Confirm the resident dashboard totals match reports stored for the signed-in account.
+- Filter reports by status and sort them by newest, oldest, or workflow status.
+- Add a valid comment to an owned report and confirm it appears in chronological order.
+- Confirm invalid comments are rejected and another resident receives 404 for the report conversation.
+- Run the API build, frontend TypeScript check, and the focused report smoke test.
+- Review the [Week 7 implementation notes](WEEK_07.md) and confirm the week before starting Week 8.

@@ -9,7 +9,8 @@ The resident-facing website for the Smart Community System. This first implement
 - an authenticated account page;
 - resident report submission with review and confirmation;
 - Google Maps place search and map-pin selection with a manual location fallback;
-- resident-owned report list and detail pages;
+- a resident dashboard with status totals and recent reports;
+- resident-owned report filtering, detail timelines, and comments;
 - issue categories, status examples, and community metrics;
 - public privacy and security information; and
 - production-build and rendered-route tests.
@@ -56,9 +57,10 @@ npm test
 - `app/logout/page.tsx` — logout confirmation states
 - `app/account/page.tsx` — authenticated account session
 - `app/reports/new/page.tsx` — validated report form, review, and submission
+- `app/dashboard/page.tsx` — resident totals, status breakdown, and recent reports
 - `app/_components/GoogleLocationPicker.tsx` — Google place search, map marker, and manual fallback
-- `app/reports/page.tsx` — current resident's report list
-- `app/reports/[reference]/page.tsx` — owned report detail and status history
+- `app/reports/page.tsx` — filtered and sorted current-resident report list
+- `app/reports/[reference]/page.tsx` — owned report detail, status timeline, and comments
 - `app/_lib/api.ts` — credentialed API requests
 - `app/globals.css` — design system, responsive layout, and accessibility states
 - `public/og.png` — site-specific social preview card

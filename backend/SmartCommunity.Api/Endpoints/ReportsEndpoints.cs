@@ -21,6 +21,10 @@ public static class ReportsEndpoints
         reports.MapPost("/", CreateReport);
         reports.MapGet("/", ListReports);
         reports.MapGet("/{reference}", GetReport);
+        reports.MapGet("/{reference}/comments", ListComments);
+        reports.MapPost("/{reference}/comments", CreateComment);
+        endpoints.MapGet("/api/v1/resident/dashboard", GetDashboard)
+            .RequireAuthorization(policy => policy.RequireRole(Roles.Resident));
         return endpoints;
     }
 
@@ -78,18 +82,35 @@ public static class ReportsEndpoints
         await db.SaveChangesAsync();
         var response = new ReportDetailResponse(report.ReferenceNo, category.Name, category.Slug,
             report.Description, report.Location, report.Latitude, report.Longitude, report.GooglePlaceId,
-            submittedStatus.Name, report.SubmittedAt,
+            submittedStatus.Code, submittedStatus.Name, report.SubmittedAt,
             [new StatusHistoryResponse(submittedStatus.Name, now, "Report submitted")]);
         return Results.Created($"/api/v1/reports/{report.ReferenceNo}", response);
     }
 
-    private static async Task<IResult> ListReports(ClaimsPrincipal principal, AppDbContext db)
+    private static async Task<IResult> ListReports(string? status, string? sort, ClaimsPrincipal principal, AppDbContext db)
     {
         if (!TryGetUserId(principal, out var residentId)) return Results.Unauthorized();
-        return Results.Ok(await db.Reports.AsNoTracking().Where(report => report.ResidentId == residentId)
-            .OrderByDescending(report => report.SubmittedAt)
+        var query = db.Reports.AsNoTracking().Where(report => report.ResidentId == residentId);
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            var statusCode = status.Trim().ToUpperInvariant();
+            if (!await db.ReportStatuses.AnyAsync(item => item.Code == statusCode))
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                    { ["status"] = ["Select a valid report status."] });
+            query = query.Where(report => report.CurrentStatus.Code == statusCode);
+        }
+
+        query = sort?.Trim().ToLowerInvariant() switch
+        {
+            "oldest" => query.OrderBy(report => report.SubmittedAt),
+            "status" => query.OrderBy(report => report.CurrentStatus.SortOrder)
+                .ThenByDescending(report => report.SubmittedAt),
+            _ => query.OrderByDescending(report => report.SubmittedAt)
+        };
+        return Results.Ok(await query
             .Select(report => new ReportSummaryResponse(report.ReferenceNo, report.Category.Name,
-                report.Location, report.Latitude, report.Longitude, report.CurrentStatus.Name, report.SubmittedAt))
+                report.Location, report.Latitude, report.Longitude, report.CurrentStatus.Code,
+                report.CurrentStatus.Name, report.SubmittedAt))
             .ToListAsync());
     }
 
@@ -101,13 +122,69 @@ public static class ReportsEndpoints
             .Where(item => item.ResidentId == residentId && item.ReferenceNo == normalisedReference)
             .Select(item => new ReportDetailResponse(item.ReferenceNo, item.Category.Name, item.Category.Slug,
                 item.Description, item.Location, item.Latitude, item.Longitude, item.GooglePlaceId,
-                item.CurrentStatus.Name, item.SubmittedAt,
+                item.CurrentStatus.Code, item.CurrentStatus.Name, item.SubmittedAt,
                 db.StatusHistory.Where(history => history.ReportId == item.Id)
                     .OrderBy(history => history.ChangedAt)
                     .Select(history => new StatusHistoryResponse(history.Status.Name, history.ChangedAt, history.Note))
                     .ToList()))
             .SingleOrDefaultAsync();
         return report is null ? Results.NotFound(new { message = "Report not found." }) : Results.Ok(report);
+    }
+
+    private static async Task<IResult> GetDashboard(ClaimsPrincipal principal, AppDbContext db)
+    {
+        if (!TryGetUserId(principal, out var residentId)) return Results.Unauthorized();
+        var statusCounts = await db.ReportStatuses.AsNoTracking().OrderBy(status => status.SortOrder)
+            .Select(status => new StatusCountResponse(status.Code, status.Name,
+                db.Reports.Count(report => report.ResidentId == residentId && report.CurrentStatusId == status.Id)))
+            .ToListAsync();
+        var recentReports = await db.Reports.AsNoTracking().Where(report => report.ResidentId == residentId)
+            .OrderByDescending(report => report.SubmittedAt).Take(5)
+            .Select(report => new ReportSummaryResponse(report.ReferenceNo, report.Category.Name,
+                report.Location, report.Latitude, report.Longitude, report.CurrentStatus.Code,
+                report.CurrentStatus.Name, report.SubmittedAt))
+            .ToListAsync();
+        return Results.Ok(new ResidentDashboardResponse(statusCounts.Sum(status => status.Count),
+            statusCounts, recentReports));
+    }
+
+    private static async Task<IResult> ListComments(string reference, ClaimsPrincipal principal, AppDbContext db)
+    {
+        if (!TryGetUserId(principal, out var residentId)) return Results.Unauthorized();
+        var normalisedReference = reference.Trim().ToUpperInvariant();
+        var reportId = await db.Reports.AsNoTracking()
+            .Where(report => report.ResidentId == residentId && report.ReferenceNo == normalisedReference)
+            .Select(report => (Guid?)report.Id).SingleOrDefaultAsync();
+        if (reportId is null) return Results.NotFound(new { message = "Report not found." });
+        return Results.Ok(await db.Comments.AsNoTracking().Where(comment => comment.ReportId == reportId)
+            .OrderBy(comment => comment.CreatedAt)
+            .Select(comment => new CommentResponse(comment.Id, comment.Author.Name, comment.Body, comment.CreatedAt))
+            .ToListAsync());
+    }
+
+    private static async Task<IResult> CreateComment(string reference, CreateCommentRequest request,
+        ClaimsPrincipal principal, AppDbContext db)
+    {
+        if (!TryGetUserId(principal, out var residentId)) return Results.Unauthorized();
+        var body = request.Body?.Trim() ?? "";
+        if (body.Length is < 2 or > 1000)
+            return Results.ValidationProblem(new Dictionary<string, string[]>
+                { ["body"] = ["Enter a comment using 2 to 1,000 characters."] });
+        var normalisedReference = reference.Trim().ToUpperInvariant();
+        var reportId = await db.Reports.AsNoTracking()
+            .Where(report => report.ResidentId == residentId && report.ReferenceNo == normalisedReference)
+            .Select(report => (Guid?)report.Id).SingleOrDefaultAsync();
+        if (reportId is null) return Results.NotFound(new { message = "Report not found." });
+        var comment = new ReportComment
+        {
+            Id = Guid.NewGuid(), ReportId = reportId.Value, AuthorId = residentId,
+            Body = body, CreatedAt = DateTimeOffset.UtcNow
+        };
+        db.Comments.Add(comment);
+        await db.SaveChangesAsync();
+        var authorName = principal.FindFirstValue(ClaimTypes.Name) ?? "Resident";
+        return Results.Created($"/api/v1/reports/{normalisedReference}/comments/{comment.Id}",
+            new CommentResponse(comment.Id, authorName, comment.Body, comment.CreatedAt));
     }
 
     private static bool TryGetUserId(ClaimsPrincipal principal, out Guid userId) =>
@@ -118,8 +195,13 @@ public record CategoryResponse(Guid Id, string Slug, string Name, string Descrip
 public record CreateReportRequest(Guid? CategoryId, string? Description, string? Location,
     decimal? Latitude, decimal? Longitude, string? GooglePlaceId);
 public record ReportSummaryResponse(string Reference, string Category, string Location,
-    decimal? Latitude, decimal? Longitude, string Status, DateTimeOffset SubmittedAt);
+    decimal? Latitude, decimal? Longitude, string StatusCode, string Status, DateTimeOffset SubmittedAt);
 public record StatusHistoryResponse(string Status, DateTimeOffset ChangedAt, string? Note);
 public record ReportDetailResponse(string Reference, string Category, string CategorySlug, string Description,
     string Location, decimal? Latitude, decimal? Longitude, string? GooglePlaceId,
-    string Status, DateTimeOffset SubmittedAt, IReadOnlyList<StatusHistoryResponse> History);
+    string StatusCode, string Status, DateTimeOffset SubmittedAt, IReadOnlyList<StatusHistoryResponse> History);
+public record StatusCountResponse(string Code, string Name, int Count);
+public record ResidentDashboardResponse(int TotalReports, IReadOnlyList<StatusCountResponse> StatusCounts,
+    IReadOnlyList<ReportSummaryResponse> RecentReports);
+public record CreateCommentRequest(string? Body);
+public record CommentResponse(Guid Id, string AuthorName, string Body, DateTimeOffset CreatedAt);

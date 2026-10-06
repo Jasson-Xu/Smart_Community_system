@@ -15,6 +15,7 @@ export function ResidentShell({ eyebrow, title, description, children }: {
           <span><strong>Smart Community</strong><small>Resident service</small></span>
         </Link>
         <nav aria-label="Resident navigation">
+          <Link href="/dashboard">Dashboard</Link>
           <Link href="/reports">My reports</Link>
           <Link href="/reports/new">New report</Link>
           <Link href="/account">Account</Link>

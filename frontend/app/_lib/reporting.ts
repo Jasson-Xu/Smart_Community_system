@@ -5,10 +5,18 @@ export type ReportSummary = {
   location: string;
   latitude: number | null;
   longitude: number | null;
+  statusCode: string;
   status: string;
   submittedAt: string;
 };
 export type StatusHistory = { status: string; changedAt: string; note: string | null };
+export type ReportComment = { id: string; authorName: string; body: string; createdAt: string };
+export type StatusCount = { code: string; name: string; count: number };
+export type ResidentDashboard = {
+  totalReports: number;
+  statusCounts: StatusCount[];
+  recentReports: ReportSummary[];
+};
 export type ReportDetail = ReportSummary & {
   categorySlug: string;
   description: string;
