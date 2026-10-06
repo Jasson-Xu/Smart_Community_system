@@ -52,9 +52,12 @@ public static class StaffEndpoints
     }
 
     private static async Task<IResult> GetAssignableUsers(AppDbContext db) => Results.Ok(
-        await db.Users.AsNoTracking().Where(user => user.Role == Roles.Staff || user.Role == Roles.Administrator)
+        await db.Users.AsNoTracking().Where(user => user.IsActive && user.UserRoles.Any(item =>
+                item.Role.Name == Roles.Staff || item.Role.Name == Roles.Administrator))
             .OrderBy(user => user.Name)
-            .Select(user => new StaffUserResponse(user.Id, user.Name, user.Email, user.Role)).ToListAsync());
+            .Select(user => new StaffUserResponse(user.Id, user.Name, user.Email,
+                user.UserRoles.Any(item => item.Role.Name == Roles.Administrator) ? Roles.Administrator : Roles.Staff))
+            .ToListAsync());
 
     private static async Task<IResult> ListReports(string? q, string? status, string? priority,
         Guid? assignedTo, string? sort, AppDbContext db)
@@ -122,7 +125,9 @@ public static class StaffEndpoints
                 item.AssignedByUser.Name, item.AssignedAt)).ToListAsync();
         var comments = await db.Comments.AsNoTracking().Where(item => item.ReportId == report.Id)
             .OrderBy(item => item.CreatedAt)
-            .Select(item => new StaffCommentResponse(item.Id, item.Author.Name, item.Author.Role, item.Body,
+            .Select(item => new StaffCommentResponse(item.Id, item.Author.Name,
+                item.Author.UserRoles.Any(role => role.Role.Name == Roles.Administrator) ? Roles.Administrator :
+                item.Author.UserRoles.Any(role => role.Role.Name == Roles.Staff) ? Roles.Staff : Roles.Resident, item.Body,
                 item.CreatedAt)).ToListAsync();
         var duplicates = await db.DuplicateReviews.AsNoTracking().Where(item => item.ReportId == report.Id)
             .OrderByDescending(item => item.CreatedAt)
@@ -155,7 +160,7 @@ public static class StaffEndpoints
         var report = await db.Reports.AsNoTracking().SingleOrDefaultAsync(item => item.ReferenceNo == NormaliseReference(reference));
         if (report is null) return Results.NotFound(new { message = "Report not found." });
         var assignee = await db.Users.AsNoTracking().SingleOrDefaultAsync(user => user.Id == request.AssignedToUserId &&
-            (user.Role == Roles.Staff || user.Role == Roles.Administrator));
+            user.IsActive && user.UserRoles.Any(item => item.Role.Name == Roles.Staff || item.Role.Name == Roles.Administrator));
         if (assignee is null)
             return Results.ValidationProblem(new Dictionary<string, string[]> { ["assignedToUserId"] = ["Select an active staff or administrator account."] });
         var assignment = new ReportAssignment
@@ -219,7 +224,7 @@ public static class StaffEndpoints
         await db.SaveChangesAsync();
         return Results.Created($"/api/v1/staff/reports/{NormaliseReference(reference)}/comments/{comment.Id}",
             new StaffCommentResponse(comment.Id, principal.FindFirstValue(ClaimTypes.Name) ?? "Staff",
-                principal.FindFirstValue(ClaimTypes.Role) ?? Roles.Staff, comment.Body, comment.CreatedAt));
+                PrimaryRole(principal), comment.Body, comment.CreatedAt));
     }
 
     private static async Task<IResult> MarkDuplicate(string reference, DuplicateRequest request,
@@ -264,6 +269,8 @@ public static class StaffEndpoints
     private static string NormaliseReference(string reference) => reference.Trim().ToUpperInvariant();
     private static bool TryGetUserId(ClaimsPrincipal principal, out Guid userId) =>
         Guid.TryParse(principal.FindFirstValue(ClaimTypes.NameIdentifier), out userId);
+    private static string PrimaryRole(ClaimsPrincipal principal) => principal.IsInRole(Roles.Administrator)
+        ? Roles.Administrator : principal.IsInRole(Roles.Staff) ? Roles.Staff : Roles.Resident;
 }
 
 public record StaffCountResponse(string Code, string Name, int Count);

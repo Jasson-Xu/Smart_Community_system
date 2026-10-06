@@ -6,6 +6,8 @@ namespace SmartCommunity.Api.Data;
 public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<AppUser> Users => Set<AppUser>();
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<UserRole> UserRoles => Set<UserRole>();
     public DbSet<IssueCategory> Categories => Set<IssueCategory>();
     public DbSet<ReportStatus> ReportStatuses => Set<ReportStatus>();
     public DbSet<CommunityReport> Reports => Set<CommunityReport>();
@@ -13,6 +15,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<ReportComment> Comments => Set<ReportComment>();
     public DbSet<ReportAssignment> Assignments => Set<ReportAssignment>();
     public DbSet<DuplicateReview> DuplicateReviews => Set<DuplicateReview>();
+    public DbSet<SystemSetting> SystemSettings => Set<SystemSetting>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -24,8 +28,27 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
         users.Property(user => user.Email).HasColumnName("email").HasMaxLength(254).IsRequired();
         users.HasIndex(user => user.Email).IsUnique();
         users.Property(user => user.PasswordHash).HasColumnName("password_hash").IsRequired();
-        users.Property(user => user.Role).HasColumnName("role").HasMaxLength(32).IsRequired();
+        users.Property(user => user.IsActive).HasColumnName("is_active").HasDefaultValue(true).IsRequired();
         users.Property(user => user.CreatedAt).HasColumnName("created_at").IsRequired();
+
+        var roleEntities = modelBuilder.Entity<Role>();
+        roleEntities.ToTable("roles");
+        roleEntities.HasKey(role => role.Id);
+        roleEntities.Property(role => role.Id).HasColumnName("id");
+        roleEntities.Property(role => role.Name).HasColumnName("name").HasMaxLength(32).IsRequired();
+        roleEntities.HasIndex(role => role.Name).IsUnique();
+        roleEntities.Property(role => role.Description).HasColumnName("description").HasMaxLength(200).IsRequired();
+
+        var userRoles = modelBuilder.Entity<UserRole>();
+        userRoles.ToTable("user_roles");
+        userRoles.HasKey(item => new { item.UserId, item.RoleId });
+        userRoles.Property(item => item.UserId).HasColumnName("user_id");
+        userRoles.Property(item => item.RoleId).HasColumnName("role_id");
+        userRoles.HasOne(item => item.User).WithMany(user => user.UserRoles).HasForeignKey(item => item.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        userRoles.HasOne(item => item.Role).WithMany().HasForeignKey(item => item.RoleId)
+            .OnDelete(DeleteBehavior.Restrict);
+        userRoles.HasIndex(item => item.RoleId);
 
         var categories = modelBuilder.Entity<IssueCategory>();
         categories.ToTable("categories");
@@ -147,6 +170,35 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
         duplicateReviews.Property(review => review.Note).HasColumnName("note").HasMaxLength(500);
         duplicateReviews.Property(review => review.CreatedAt).HasColumnName("created_at").IsRequired();
 
+        var settings = modelBuilder.Entity<SystemSetting>();
+        settings.ToTable("system_settings", table => table.HasCheckConstraint("CK_system_settings_version", "version > 0"));
+        settings.HasKey(setting => setting.Id);
+        settings.Property(setting => setting.Id).HasColumnName("id");
+        settings.Property(setting => setting.Key).HasColumnName("key").HasMaxLength(80).IsRequired();
+        settings.HasIndex(setting => setting.Key).IsUnique();
+        settings.Property(setting => setting.Value).HasColumnName("value").HasMaxLength(1000).IsRequired();
+        settings.Property(setting => setting.Description).HasColumnName("description").HasMaxLength(240).IsRequired();
+        settings.Property(setting => setting.Version).HasColumnName("version").IsRequired();
+        settings.Property(setting => setting.UpdatedByUserId).HasColumnName("updated_by_user_id");
+        settings.HasOne(setting => setting.UpdatedByUser).WithMany().HasForeignKey(setting => setting.UpdatedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+        settings.Property(setting => setting.UpdatedAt).HasColumnName("updated_at").IsRequired();
+
+        var auditLogs = modelBuilder.Entity<AuditLog>();
+        auditLogs.ToTable("audit_logs");
+        auditLogs.HasKey(log => log.Id);
+        auditLogs.Property(log => log.Id).HasColumnName("id");
+        auditLogs.Property(log => log.ActorUserId).HasColumnName("actor_user_id");
+        auditLogs.HasOne(log => log.ActorUser).WithMany().HasForeignKey(log => log.ActorUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+        auditLogs.Property(log => log.Action).HasColumnName("action").HasMaxLength(80).IsRequired();
+        auditLogs.Property(log => log.EntityType).HasColumnName("entity_type").HasMaxLength(80).IsRequired();
+        auditLogs.Property(log => log.EntityId).HasColumnName("entity_id").HasMaxLength(100).IsRequired();
+        auditLogs.Property(log => log.Details).HasColumnName("details").HasMaxLength(2000).IsRequired();
+        auditLogs.Property(log => log.CreatedAt).HasColumnName("created_at").IsRequired();
+        auditLogs.HasIndex(log => new { log.EntityType, log.EntityId, log.CreatedAt });
+        auditLogs.HasIndex(log => new { log.ActorUserId, log.CreatedAt });
+
         categories.HasData(
             new IssueCategory { Id = Guid.Parse("3f8d8599-7bbd-4f05-a915-7196b552f001"), Slug = "roads-footpaths", Name = "Roads & footpaths", Description = "Potholes, cracks and access hazards", SortOrder = 10 },
             new IssueCategory { Id = Guid.Parse("3f8d8599-7bbd-4f05-a915-7196b552f002"), Slug = "street-lighting", Name = "Street lighting", Description = "Faulty or damaged public lighting", SortOrder = 20 },
@@ -160,6 +212,11 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             new ReportStatus { Id = Guid.Parse("7c20c2c3-45f8-4d9c-8525-593a1841a004"), Code = "IN_PROGRESS", Name = "In progress", SortOrder = 40 },
             new ReportStatus { Id = Guid.Parse("7c20c2c3-45f8-4d9c-8525-593a1841a005"), Code = "RESOLVED", Name = "Resolved", SortOrder = 50 },
             new ReportStatus { Id = Guid.Parse("7c20c2c3-45f8-4d9c-8525-593a1841a006"), Code = "CLOSED", Name = "Closed", SortOrder = 60 }
+        );
+        roleEntities.HasData(
+            new Role { Id = Guid.Parse("c91d58b6-f7b3-43d2-a718-64b93ca1a001"), Name = SmartCommunity.Api.Models.Roles.Resident, Description = "Submits and tracks community reports" },
+            new Role { Id = Guid.Parse("c91d58b6-f7b3-43d2-a718-64b93ca1a002"), Name = SmartCommunity.Api.Models.Roles.Staff, Description = "Processes community reports" },
+            new Role { Id = Guid.Parse("c91d58b6-f7b3-43d2-a718-64b93ca1a003"), Name = SmartCommunity.Api.Models.Roles.Administrator, Description = "Manages access and system configuration" }
         );
     }
 }

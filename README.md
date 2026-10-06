@@ -4,7 +4,7 @@ A secure, accessible web platform for residents to report community issues and f
 
 The system supports concerns affecting public infrastructure, environmental quality, accessibility, and community safety, including potholes, broken streetlights, damaged footpaths, illegal dumping, and similar local hazards. It contributes to **United Nations Sustainable Development Goal 11: Sustainable Cities and Communities** by improving service visibility, accountability, and community participation.
 
-> **Project status:** Week 8 staff operations have passed local verification and await project-owner confirmation. Week 6 photograph handling is deferred. This is an individual, 12-week academic project and is not a production council service.
+> **Project status:** Week 9 administration and audit controls have passed local verification and await project-owner confirmation. Week 6 photograph handling is deferred. This is an individual, 12-week academic project and is not a production council service.
 
 ## Core capabilities
 
@@ -70,7 +70,7 @@ Native mobile applications, AI-based classification, emergency dispatch, automat
 
 ## Frontend development
 
-The frontend is available in [`frontend/`](frontend/). Resident functions include the dashboard, Google Maps report submission, filtering, timelines, and comments. Staff functions include an operational dashboard, searchable report queue, priority, assignment, controlled status updates, replies, and duplicate review. All operational data uses the PostgreSQL-backed API in [`backend/`](backend/README.md). Homepage community metrics remain illustrative.
+The frontend is available in [`frontend/`](frontend/). Resident functions include reporting, tracking, and comments. Staff functions cover operational processing. Administrator functions cover users, roles, categories, approved settings, and audit records. All operational data uses the PostgreSQL-backed API in [`backend/`](backend/README.md). Homepage community metrics remain illustrative.
 
 Requirements:
 

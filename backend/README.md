@@ -1,6 +1,6 @@
 # Smart Community API
 
-The API provides PostgreSQL-backed accounts, resident issue reporting, dashboards, comments, and staff workflow operations. Public registration always creates a resident account. Staff and administrator accounts can only be provisioned by an operator with database access.
+The API provides PostgreSQL-backed identity, resident reporting, staff workflows, and administrative governance. Public registration always creates a resident account. Administrator role changes are audited and protected from removing the final active administrator.
 
 ## Local setup
 
@@ -52,6 +52,16 @@ Prerequisites: .NET 10 SDK, Docker with Compose, and Node.js 22.13 or later for 
 | POST | `/api/v1/staff/reports/{reference}/status` | Staff or administrator | Apply the next permitted status transition |
 | POST | `/api/v1/staff/reports/{reference}/comments` | Staff or administrator | Reply in the resident conversation |
 | POST | `/api/v1/staff/reports/{reference}/duplicates` | Staff or administrator | Record a potential duplicate for review |
+| GET | `/api/v1/admin/dashboard` | Administrator | Account, category, role, and audit summary |
+| GET | `/api/v1/admin/roles` | Administrator | Available access roles |
+| GET | `/api/v1/admin/users` | Administrator | Search and filter accounts |
+| PATCH | `/api/v1/admin/users/{id}/status` | Administrator | Activate or deactivate an account |
+| PUT | `/api/v1/admin/users/{id}/roles` | Administrator | Replace an account's role assignments |
+| GET/POST | `/api/v1/admin/categories` | Administrator | List or create issue categories |
+| PATCH | `/api/v1/admin/categories/{id}` | Administrator | Update or deactivate a category |
+| GET | `/api/v1/admin/settings` | Administrator | List approved non-secret settings |
+| PUT | `/api/v1/admin/settings/{key}` | Administrator | Version and update an approved setting |
+| GET | `/api/v1/admin/audit-logs` | Administrator | Read recent administrative audit records |
 
 The browser sends credentials with requests. POST requests must include `X-Requested-With: XMLHttpRequest`; browser requests with an `Origin` header must match `Frontend:Origin`. The API accepts credentialed CORS requests only from that origin. Registration and login are limited to ten requests per minute per client IP. Cookies are HttpOnly and secure in non-development environments. Production must place the frontend and API on the same site and use HTTPS.
 
@@ -81,4 +91,4 @@ The local login page also displays these credentials. All three roles currently 
 
 Run `dotnet build backend/SmartCommunity.Api`, `pwsh -File scripts/smoke-auth.ps1`, and `pwsh -File scripts/smoke-reports.ps1` after the database and API are running. The report test creates synthetic residents and reports, then verifies report validation, dashboard totals, filtering, comments, ownership, and role restrictions.
 
-The API does not yet implement photograph storage, notifications, account recovery, or administrative management. Those remain scheduled or deferred to later work.
+The API does not yet implement photograph storage, notifications, feedback, account recovery, or production deployment. Those remain scheduled or deferred to later work.

@@ -13,6 +13,7 @@ The resident-facing website for the Smart Community System. This first implement
 - resident-owned report filtering, detail timelines, and comments;
 - a staff operations dashboard and searchable report queue;
 - staff priority, assignment, status, reply, and duplicate-review controls;
+- administrator dashboards and user, role, category, setting, and audit management;
 - issue categories, status examples, and community metrics;
 - public privacy and security information; and
 - production-build and rendered-route tests.
@@ -66,6 +67,11 @@ npm test
 - `app/staff/page.tsx` — staff operational totals and recent reports
 - `app/staff/reports/page.tsx` — searchable and filterable council report queue
 - `app/staff/reports/[reference]/page.tsx` — staff workflow and report review controls
+- `app/admin/page.tsx` — administration summary and recent audit activity
+- `app/admin/users/page.tsx` — account activation and multi-role management
+- `app/admin/categories/page.tsx` — issue category creation, editing, ordering, and activation
+- `app/admin/settings/page.tsx` — approved non-secret operational settings
+- `app/admin/audit/page.tsx` — filterable administrative audit records
 - `app/_lib/api.ts` — credentialed API requests
 - `app/globals.css` — design system, responsive layout, and accessibility states
 - `public/og.png` — site-specific social preview card

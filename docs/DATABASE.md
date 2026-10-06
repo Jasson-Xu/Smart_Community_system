@@ -1,8 +1,8 @@
 # Proposed Database Design
 
-This document defines the target PostgreSQL data model for the Smart Community System. Week 4 created `users`; Week 5 added `categories`, `report_statuses`, `reports`, and `status_history`; Week 7 added `comments`; Week 8 adds report priority, `assignments`, and `duplicate_reviews`. The remaining governance tables are scheduled for later weeks.
+This document defines the PostgreSQL data model for the Smart Community System. Week 4 created `users`; Week 5 added reporting; Week 7 added comments; Week 8 added staff workflow data; Week 9 normalises roles and adds `system_settings` and `audit_logs`.
 
-The initial `users` table has a single `role` column so the API can enforce Resident, Staff, and Administrator access. The target `roles` and `user_roles` tables below remain a later design step; migration to those tables must preserve existing account roles. Week 5 report references use `SC-<year>-<12 hexadecimal characters>` and are protected by a unique database index. A report can also store `latitude`, `longitude`, and `google_place_id` supplied by the Google Maps picker.
+Week 9 migrated the initial `users.role` values into seeded `roles` and composite-key `user_roles` records before dropping the legacy column. Users can now hold multiple roles, and `users.is_active` blocks inactive accounts. Week 5 report references use `SC-<year>-<12 hexadecimal characters>` and are protected by a unique database index. A report can also store `latitude`, `longitude`, and `google_place_id` supplied by the Google Maps picker.
 
 ## Design goals
 
@@ -27,7 +27,7 @@ The initial `users` table has a single `role` column so the API can enforce Resi
 | Workflow | `assignments` | Report assignment history for council staff. |
 | Workflow | `duplicate_reviews` | Staff-recorded potential duplicate relationships without automatic deletion. |
 | Workflow | `status_history` | Immutable report status transitions. |
-| Workflow | `comments` | Implemented chronological resident report discussion, with staff participation planned for Week 8. |
+| Workflow | `comments` | Chronological resident and staff report discussion. |
 | Engagement | `notifications` | Delivery and read state for report updates. |
 | Engagement | `feedback` | One resident rating after report resolution. |
 | Governance | `audit_logs` | Important security and administrative activity. |
@@ -49,6 +49,8 @@ The initial `users` table has a single `role` column so the API can enforce Resi
 - Comment bodies are limited to 1,000 characters and retain their author and creation timestamp.
 - Notification index: `(recipient_id, read_at, created_at DESC)`.
 - Audit index: `(entity_type, entity_id, created_at DESC)` and `(actor_user_id, created_at DESC)`.
+- Settings use approved keys, a version number, last editor, and last-update timestamp; secrets are excluded.
+- Audit rows are append-only through the application API and store action, actor, entity, details, and UTC timestamp.
 
 ## Status and status history
 

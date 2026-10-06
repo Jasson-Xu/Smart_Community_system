@@ -4,7 +4,7 @@ This roadmap prioritises a secure, demonstrable core workflow for an individual 
 
 Each week ends with a review of the implemented code, documentation, and verification results. Work on the following week begins after the project owner confirms the current week's result. The project owner handles Git commits and pushes.
 
-> **Current progress:** Week 8 implementation and local verification are complete, awaiting project-owner confirmation. Staff and administrators can search and filter the operational queue, set priority, preserve assignment history, progress reports through validated status transitions, reply to residents, and record potential duplicates. Week 6 photograph handling remains deferred.
+> **Current progress:** Week 9 implementation and local verification are complete, awaiting project-owner confirmation. Administrators can manage active accounts, normalised roles, issue categories, approved non-secret settings, and append-only audit records. Week 6 photograph handling remains deferred.
 
 | Week | Focus | Expected outcome |
 | --- | --- | --- |
@@ -66,3 +66,15 @@ Optional functions should be deferred before any essential privacy, security, ac
 - Record a potential duplicate and confirm neither report is deleted or merged automatically.
 - Run the API build, frontend TypeScript check, and focused staff workflow smoke test.
 - Review the [Week 8 implementation notes](WEEK_08.md) and confirm the week before starting Week 9.
+
+## Week 9 acceptance gate
+
+- Confirm Resident and Staff accounts receive 403 from administration endpoints.
+- Confirm existing accounts retain their access after migration from `users.role` to `roles` and `user_roles`.
+- Change a test user's roles and confirm its existing session is rejected before a new login receives the new permissions.
+- Deactivate and reactivate a test account, and confirm inactive accounts cannot sign in.
+- Create and deactivate a category, confirming the resident form only receives active categories.
+- Update an approved setting, reject an unapproved secret-style key, and confirm audit entries exist.
+- Confirm an administrator cannot deactivate itself or remove its own Administrator role.
+- Run the API build, frontend TypeScript check, and focused administration smoke test.
+- Review the [Week 9 implementation notes](WEEK_09.md) and confirm the week before starting Week 10.

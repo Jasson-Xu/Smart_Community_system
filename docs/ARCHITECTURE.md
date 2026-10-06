@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document records the target architecture for the Smart Community System. Identity, resident reporting, dashboards, comments, staff search, priority, assignment, controlled status transitions, replies, and duplicate review are implemented. Photograph storage, administration, notifications, and AWS deployment remain target components.
+This document records the target architecture for the Smart Community System. Identity, reporting, staff operations, normalised role administration, category management, approved settings, and audit records are implemented. Photograph storage, notifications, feedback, and AWS deployment remain target components.
 
 ## System context
 

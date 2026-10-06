@@ -58,8 +58,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                 return;
             }
             var db = context.HttpContext.RequestServices.GetRequiredService<AppDbContext>();
-            var current = await db.Users.AsNoTracking().SingleOrDefaultAsync(user => user.Id == id);
-            if (current is null || current.Role != context.Principal?.FindFirstValue(ClaimTypes.Role))
+            var current = await db.Users.AsNoTracking().Where(user => user.Id == id)
+                .Select(user => new { user.IsActive, Roles = user.UserRoles.Select(item => item.Role.Name).ToList() })
+                .SingleOrDefaultAsync();
+            var claimedRoles = context.Principal?.FindAll(ClaimTypes.Role).Select(claim => claim.Value)
+                .ToHashSet(StringComparer.Ordinal) ?? [];
+            if (current is null || !current.IsActive || !claimedRoles.SetEquals(current.Roles))
                 context.RejectPrincipal();
         };
     });
@@ -121,8 +125,10 @@ auth.MapPost("/register", async (RegisterRequest request, AppDbContext db,
     if (await db.Users.AnyAsync(user => user.Email == email))
         return Results.Conflict(new { message = "An account with this email already exists." });
 
+    var residentRole = await db.Roles.SingleAsync(role => role.Name == Roles.Resident);
     var user = new AppUser { Id = Guid.NewGuid(), Name = name, Email = email,
-        Role = Roles.Resident, CreatedAt = DateTimeOffset.UtcNow };
+        IsActive = true, CreatedAt = DateTimeOffset.UtcNow };
+    user.UserRoles.Add(new UserRole { UserId = user.Id, RoleId = residentRole.Id });
     user.PasswordHash = passwordHasher.HashPassword(user, request.Password!);
     db.Users.Add(user);
     try { await db.SaveChangesAsync(); }
@@ -131,21 +137,23 @@ auth.MapPost("/register", async (RegisterRequest request, AppDbContext db,
         return Results.Conflict(new { message = "An account with this email already exists." });
     }
 
-    await http.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, PrincipalFor(user));
-    return Results.Created("/api/v1/auth/me", PublicUser.From(user));
+    await http.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, PrincipalFor(user, [Roles.Resident]));
+    return Results.Created("/api/v1/auth/me", PublicUser.From(user, [Roles.Resident]));
 }).RequireRateLimiting("identity");
 
 auth.MapPost("/login", async (LoginRequest request, AppDbContext db,
     IPasswordHasher<AppUser> passwordHasher, HttpContext http) =>
 {
     var email = request.Email?.Trim().ToLowerInvariant() ?? "";
-    var user = email.Length > 254 ? null : await db.Users.SingleOrDefaultAsync(item => item.Email == email);
-    if (user is null || request.Password is null ||
+    var user = email.Length > 254 ? null : await db.Users.Include(item => item.UserRoles)
+        .ThenInclude(item => item.Role).SingleOrDefaultAsync(item => item.Email == email);
+    if (user is null || !user.IsActive || request.Password is null ||
         passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password) == PasswordVerificationResult.Failed)
         return Results.Unauthorized();
 
-    await http.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, PrincipalFor(user));
-    return Results.Ok(PublicUser.From(user));
+    var roleNames = user.UserRoles.Select(item => item.Role.Name).ToArray();
+    await http.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, PrincipalFor(user, roleNames));
+    return Results.Ok(PublicUser.From(user, roleNames));
 }).RequireRateLimiting("identity");
 
 auth.MapPost("/logout", async (HttpContext http) =>
@@ -158,8 +166,10 @@ auth.MapGet("/me", async (HttpContext http, AppDbContext db) =>
 {
     if (!Guid.TryParse(http.User.FindFirstValue(ClaimTypes.NameIdentifier), out var id))
         return Results.Unauthorized();
-    var user = await db.Users.FindAsync(id);
-    return user is null ? Results.Unauthorized() : Results.Ok(PublicUser.From(user));
+    var user = await db.Users.Include(item => item.UserRoles).ThenInclude(item => item.Role)
+        .SingleOrDefaultAsync(item => item.Id == id && item.IsActive);
+    return user is null ? Results.Unauthorized() : Results.Ok(PublicUser.From(user,
+        user.UserRoles.Select(item => item.Role.Name)));
 }).RequireAuthorization();
 
 app.MapGet("/api/v1/staff/me", (ClaimsPrincipal user) => Results.Ok(new { role = user.FindFirstValue(ClaimTypes.Role) }))
@@ -168,6 +178,7 @@ app.MapGet("/api/v1/admin/me", (ClaimsPrincipal user) => Results.Ok(new { role =
     .RequireAuthorization(policy => policy.RequireRole(Roles.Administrator));
 app.MapReportsEndpoints();
 app.MapStaffEndpoints();
+app.MapAdminEndpoints();
 
 if (args.Contains("--bootstrap-role"))
 {
@@ -183,8 +194,10 @@ if (args.Contains("--bootstrap-role"))
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     if (await db.Users.AnyAsync(user => user.Email == email))
         throw new InvalidOperationException("Bootstrap account already exists; refusing to change its role or password.");
+    var roleRecord = await db.Roles.SingleAsync(item => item.Name == role);
     var user = new AppUser { Id = Guid.NewGuid(), Name = name, Email = email,
-        Role = role, CreatedAt = DateTimeOffset.UtcNow };
+        IsActive = true, CreatedAt = DateTimeOffset.UtcNow };
+    user.UserRoles.Add(new UserRole { UserId = user.Id, RoleId = roleRecord.Id });
     var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<AppUser>>();
     user.PasswordHash = hasher.HashPassword(user, password!);
     db.Users.Add(user);
@@ -209,7 +222,7 @@ if (args.Contains("--seed-demo"))
     };
     foreach (var demo in demoAccounts)
     {
-        var user = await db.Users.SingleOrDefaultAsync(item => item.Email == demo.Email);
+        var user = await db.Users.Include(item => item.UserRoles).SingleOrDefaultAsync(item => item.Email == demo.Email);
         if (user is null)
         {
             user = new AppUser { Id = Guid.NewGuid(), CreatedAt = DateTimeOffset.UtcNow,
@@ -217,7 +230,10 @@ if (args.Contains("--seed-demo"))
             db.Users.Add(user);
         }
         user.Name = demo.Name;
-        user.Role = demo.Role;
+        user.IsActive = true;
+        user.UserRoles.Clear();
+        var roleId = await db.Roles.Where(item => item.Name == demo.Role).Select(item => item.Id).SingleAsync();
+        user.UserRoles.Add(new UserRole { UserId = user.Id, RoleId = roleId });
         user.PasswordHash = hasher.HashPassword(user, "DemoPass123!");
     }
     await db.SaveChangesAsync();
@@ -230,15 +246,21 @@ app.Run();
 static bool ValidPassword(string? password) => password is { Length: >= 8 and <= 128 } &&
     password.Any(char.IsUpper) && password.Any(char.IsLower) && password.Any(char.IsDigit);
 
-static ClaimsPrincipal PrincipalFor(AppUser user) => new(new ClaimsIdentity(
+static ClaimsPrincipal PrincipalFor(AppUser user, IEnumerable<string> roles) => new(new ClaimsIdentity(
     [new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
      new Claim(ClaimTypes.Name, user.Name),
      new Claim(ClaimTypes.Email, user.Email),
-     new Claim(ClaimTypes.Role, user.Role)], CookieAuthenticationDefaults.AuthenticationScheme));
+     .. roles.Select(role => new Claim(ClaimTypes.Role, role))], CookieAuthenticationDefaults.AuthenticationScheme));
 
 public record RegisterRequest(string? Name, string? Email, string? Password);
 public record LoginRequest(string? Email, string? Password);
-public record PublicUser(Guid Id, string Name, string Email, string Role)
+public record PublicUser(Guid Id, string Name, string Email, string Role, IReadOnlyList<string> Roles)
 {
-    public static PublicUser From(AppUser user) => new(user.Id, user.Name, user.Email, user.Role);
+    public static PublicUser From(AppUser user, IEnumerable<string> roles)
+    {
+        var values = roles.Distinct(StringComparer.Ordinal).OrderBy(role => role).ToArray();
+        var primaryRole = values.Contains(SmartCommunity.Api.Models.Roles.Administrator) ? SmartCommunity.Api.Models.Roles.Administrator :
+            values.Contains(SmartCommunity.Api.Models.Roles.Staff) ? SmartCommunity.Api.Models.Roles.Staff : SmartCommunity.Api.Models.Roles.Resident;
+        return new PublicUser(user.Id, user.Name, user.Email, primaryRole, values);
+    }
 }

@@ -8,6 +8,7 @@ The project intends to follow [Semantic Versioning](https://semver.org/) when ve
 
 ### Added
 
+- Week 9 normalised roles, account activation, category administration, approved settings, and append-only administrative audit records.
 - Week 8 staff dashboard, searchable report queue, priority, assignment history, controlled status transitions, staff replies, and potential duplicate review.
 - Week 7 resident dashboard with per-status totals and recent reports.
 - Resident report status filtering, sorting, chronological comments, and ownership enforcement.
