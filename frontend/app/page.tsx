@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 
 const categories = [
   { name: "Roads & footpaths", detail: "Potholes, cracks and access hazards", mark: "RF", slug: "roads-footpaths" },
@@ -17,29 +18,14 @@ const updates = [
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [reportOpen, setReportOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [trackingReference, setTrackingReference] = useState("");
   const [trackingMessage, setTrackingMessage] = useState("");
-
-  function openReport() {
-    setSubmitted(false);
-    setReportOpen(true);
-  }
-
-  function submitDemoReport(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSubmitted(true);
-  }
 
   function trackDemoReport(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const reference = trackingReference.trim().toUpperCase();
-    setTrackingMessage(
-      reference
-        ? `${reference} is ready for tracking when the secure API is connected.`
-        : "Enter the reference number from your confirmation message.",
-    );
+    if (!reference) { setTrackingMessage("Enter the reference number from your confirmation page."); return; }
+    window.location.assign(`/reports/${encodeURIComponent(reference)}`);
   }
 
   return (
@@ -89,11 +75,10 @@ export default function Home() {
             Report a problem in minutes, follow every update, and help council teams respond with the right information from the start.
           </p>
         <div className="hero-actions">
-            <a className="button button-primary" href="/login?intent=report">
+            <Link className="button button-primary" href="/reports/new">
               Report an issue <span aria-hidden="true">→</span>
-            </a>
+            </Link>
             <a className="button button-secondary" href="#track">Track a report</a>
-            <button className="button button-secondary" type="button" onClick={openReport}>Preview report form</button>
           </div>
           <p className="account-prompt">Want to keep all your reports together? <a href="/register">Create a resident account</a></p>
           <div className="hero-assurance" aria-label="Service highlights">
@@ -138,18 +123,18 @@ export default function Home() {
             <p className="eyebrow">Start with the issue</p>
             <h2>What would you like to report?</h2>
           </div>
-          <a className="link-button" href="/login?intent=report">View all categories →</a>
+          <Link className="link-button" href="/reports/new">View all categories →</Link>
         </div>
         <div className="category-grid">
           {categories.map((category) => (
-            <a className="category-card" href={`/login?intent=report&category=${category.slug}`} key={category.name}>
+            <Link className="category-card" href={`/reports/new?category=${category.slug}`} key={category.name}>
               <span className="category-mark" aria-hidden="true">{category.mark}</span>
               <span>
                 <strong>{category.name}</strong>
                 <small>{category.detail}</small>
               </span>
               <b aria-hidden="true">↗</b>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -215,7 +200,7 @@ export default function Home() {
               id="tracking-reference"
               value={trackingReference}
               onChange={(event) => setTrackingReference(event.target.value)}
-              placeholder="e.g. SC-1042"
+              placeholder="e.g. SC-2026-A1B2C3D4"
             />
             <button className="button button-dark" type="submit">Check status</button>
           </div>
@@ -238,41 +223,6 @@ export default function Home() {
         <p>Academic prototype · SDG 11: Sustainable Cities and Communities</p>
       </footer>
 
-      {reportOpen && (
-        <div className="modal-backdrop" role="presentation" onMouseDown={(event) => {
-          if (event.target === event.currentTarget) setReportOpen(false);
-        }}>
-          <section
-            className="report-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="report-title"
-          >
-            <button className="modal-close" type="button" aria-label="Close report form" onClick={() => setReportOpen(false)}>×</button>
-            {!submitted ? (
-              <>
-                <p className="eyebrow">New community report</p>
-                <h2 id="report-title">What needs attention?</h2>
-                <p className="modal-note">Prototype only. Do not enter personal information or submit a real issue.</p>
-                <form className="report-form" onSubmit={submitDemoReport}>
-                  <label>Issue category<select required defaultValue=""><option value="" disabled>Select a category</option>{categories.map((category) => <option key={category.name}>{category.name}</option>)}</select></label>
-                  <label>Location<input required placeholder="Street or public place" /></label>
-                  <label>What happened?<textarea required rows={4} placeholder="Describe the issue and any immediate safety concern" /></label>
-                  <button className="button button-primary" type="submit">Review report <span aria-hidden="true">→</span></button>
-                </form>
-              </>
-            ) : (
-              <div className="success-state">
-                <span aria-hidden="true">✓</span>
-                <p className="eyebrow">Prototype complete</p>
-                <h2 id="report-title">The reporting flow is ready for the API.</h2>
-                <p>No report information was saved. The next build stage will connect report validation and secure persistence.</p>
-                <button className="button button-dark" type="button" onClick={() => setReportOpen(false)}>Return home</button>
-              </div>
-            )}
-          </section>
-        </div>
-      )}
     </main>
   );
 }

@@ -1,8 +1,8 @@
 # Proposed Database Design
 
-This document defines the target PostgreSQL data model for the Smart Community System. The Week 4 identity migration currently creates `users` only. Reporting and workflow tables are scheduled for later weeks.
+This document defines the target PostgreSQL data model for the Smart Community System. Week 4 created `users`; Week 5 adds `categories`, `report_statuses`, `reports`, and `status_history`. The remaining workflow and governance tables are scheduled for later weeks.
 
-The initial `users` table has a single `role` column so the first API can enforce Resident, Staff, and Administrator access. The target `roles` and `user_roles` tables below remain a later design step; migration to those tables must preserve existing account roles.
+The initial `users` table has a single `role` column so the API can enforce Resident, Staff, and Administrator access. The target `roles` and `user_roles` tables below remain a later design step; migration to those tables must preserve existing account roles. Week 5 report references use `SC-<year>-<12 hexadecimal characters>` and are protected by a unique database index. A report can also store `latitude`, `longitude`, and `google_place_id` supplied by the Google Maps picker.
 
 ## Design goals
 
@@ -39,6 +39,7 @@ The initial `users` table has a single `role` column so the first API can enforc
 - One feedback record per report: unique `feedback.report_id`.
 - Rating constraint: `feedback.rating BETWEEN 1 AND 5`.
 - Coordinate constraints: latitude from -90 to 90 and longitude from -180 to 180.
+- Coordinate pair constraint: latitude and longitude must either both be present or both be null; manually entered locations can omit both.
 - Report lookup indexes: `(resident_id, submitted_at DESC)`, `(current_status_id, priority, submitted_at)`, and `(category_id, submitted_at)`.
 - Workflow indexes: `(report_id, changed_at)`, `(report_id, assigned_at)`, and `(report_id, created_at)` for comments.
 - Notification index: `(recipient_id, read_at, created_at DESC)`.

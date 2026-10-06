@@ -4,7 +4,7 @@ This roadmap prioritises a secure, demonstrable core workflow for an individual 
 
 Each week ends with a review of the implemented code, documentation, and verification results. Work on the following week begins after the project owner confirms the current week's result. The project owner handles Git commits and pushes.
 
-> **Current progress:** Week 4 implementation and local verification are complete, awaiting project-owner confirmation. The registration, login, logout, and account pages call the ASP.NET Core API. PostgreSQL-backed accounts, password hashing, cookie sessions, and role-protected endpoints passed a live database smoke test.
+> **Current progress:** Week 5 implementation and local verification are complete, awaiting project-owner confirmation. Residents can submit validated reports, receive unique references, and view their own report list, details, status, and initial history. Photograph upload remains scheduled for Week 6.
 
 | Week | Focus | Expected outcome |
 | --- | --- | --- |
@@ -38,3 +38,12 @@ Optional functions should be deferred before any essential privacy, security, ac
 - Confirm a resident receives HTTP 403 from both staff and administrator endpoints, and unsafe requests without the required header receive HTTP 403.
 - Run `dotnet build`, `npm test`, `npm run lint`, and the [authentication smoke test](../scripts/smoke-auth.ps1).
 - Review the [Week 4 implementation notes](WEEK_04.md) and confirm the week before starting Week 5.
+
+## Week 5 acceptance gate
+
+- Apply the Week 5 migration and confirm the default categories and report lifecycle statuses exist.
+- Submit a synthetic report through the resident form and confirm its unique reference, `Submitted` status, and initial history record.
+- Confirm client and server validation reject incomplete reports.
+- Confirm one resident cannot read another resident's report and staff accounts cannot use resident report endpoints.
+- Run `dotnet build`, `npm test`, `npm run lint`, TypeScript checking, and `scripts/smoke-reports.ps1`.
+- Review the [Week 5 implementation notes](WEEK_05.md) and confirm the week before starting Week 6.

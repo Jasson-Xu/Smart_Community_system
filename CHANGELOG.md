@@ -8,6 +8,10 @@ The project intends to follow [Semantic Versioning](https://semver.org/) when ve
 
 ### Added
 
+- Week 5 report categories, lifecycle statuses, report persistence, unique references, and initial status history.
+- Google Maps place autocomplete and map-pin selection with persisted coordinates and Place ID.
+- Resident report form with review and confirmation, owned report list, and report detail page.
+- Report API smoke test covering validation, ownership, role restrictions, and reference uniqueness.
 - Week 4 ASP.NET Core API with PostgreSQL identity migration, password hashing, cookie sessions, role checks, and operator-only role account bootstrap.
 - Connected frontend registration, login, logout, and account session page.
 - Local PostgreSQL Compose configuration and authentication smoke test.

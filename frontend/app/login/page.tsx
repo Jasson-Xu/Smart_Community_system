@@ -38,7 +38,9 @@ export default function LoginPage() {
           await errorMessage(response, "Sign in failed. Please try again."));
         return;
       }
-      window.location.assign("/account");
+      const requestedPath = new URLSearchParams(window.location.search).get("next");
+      const safePath = requestedPath?.startsWith("/") && !requestedPath.startsWith("//") ? requestedPath : "/account";
+      window.location.assign(safePath);
     } catch {
       setMessage("The account service is unavailable. Please try again later.");
     } finally {

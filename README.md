@@ -4,7 +4,7 @@ A secure, accessible web platform for residents to report community issues and f
 
 The system supports concerns affecting public infrastructure, environmental quality, accessibility, and community safety, including potholes, broken streetlights, damaged footpaths, illegal dumping, and similar local hazards. It contributes to **United Nations Sustainable Development Goal 11: Sustainable Cities and Communities** by improving service visibility, accountability, and community participation.
 
-> **Project status:** Week 4 identity integration has passed local verification and awaits project-owner confirmation. This is an individual, 12-week academic project and is not a production council service.
+> **Project status:** Week 5 resident issue submission has passed local verification and awaits project-owner confirmation. This is an individual, 12-week academic project and is not a production council service.
 
 ## Core capabilities
 
@@ -38,6 +38,7 @@ The system supports concerns affecting public infrastructure, environmental qual
 | API | ASP.NET Core Web API |
 | Data access | Entity Framework Core with Npgsql |
 | Database | PostgreSQL |
+| Location search and map | Google Maps JavaScript API and Places API (New) |
 | Local environment | Docker |
 | Application hosting | Amazon EC2 |
 | Production database | Amazon RDS for PostgreSQL |
@@ -69,7 +70,7 @@ Native mobile applications, AI-based classification, emergency dispatch, automat
 
 ## Frontend development
 
-The resident-facing frontend is available in [`frontend/`](frontend/). It includes the responsive homepage, report-flow prototype, tracking preview, account pages, and public privacy and security pages. Registration, login, logout, and account lookup now call the PostgreSQL-backed API in [`backend/`](backend/README.md). Report submission and tracking still use illustrative data.
+The resident-facing frontend is available in [`frontend/`](frontend/). It includes the responsive homepage, account pages, resident report submission with Google Maps place search and pin selection, owned report list and detail pages, and public privacy and security pages. Registration, sessions, categories, and reports use the PostgreSQL-backed API in [`backend/`](backend/README.md). Homepage metrics and recent activity remain illustrative.
 
 Requirements:
 

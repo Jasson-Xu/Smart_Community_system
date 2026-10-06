@@ -26,7 +26,7 @@ export function AuthShell({ eyebrow, title, description, asideMessage, children 
             <div className="auth-aside-copy">
               <p className="eyebrow">A clearer connection</p>
               <h2>Your reports stay connected to you.</h2>
-              <p>An account will let residents follow progress, receive important updates, add relevant comments, and keep a history of submitted issues.</p>
+              <p>An account lets residents submit issues, view their reports and status history, and stay connected to future updates.</p>
             </div>
             <ol className="auth-benefits">
               <li><span>01</span><div><strong>One private account</strong><small>Manage your reports from one place.</small></div></li>

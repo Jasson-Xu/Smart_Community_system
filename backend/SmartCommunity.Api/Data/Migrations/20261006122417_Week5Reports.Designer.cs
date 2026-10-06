@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SmartCommunity.Api.Data;
@@ -11,9 +12,11 @@ using SmartCommunity.Api.Data;
 namespace SmartCommunity.Api.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261006122417_Week5Reports")]
+    partial class Week5Reports
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,26 +88,11 @@ namespace SmartCommunity.Api.Data.Migrations
                         .HasColumnType("character varying(2000)")
                         .HasColumnName("description");
 
-                    b.Property<string>("GooglePlaceId")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("google_place_id");
-
-                    b.Property<decimal?>("Latitude")
-                        .HasPrecision(9, 6)
-                        .HasColumnType("numeric(9,6)")
-                        .HasColumnName("latitude");
-
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)")
                         .HasColumnName("location");
-
-                    b.Property<decimal?>("Longitude")
-                        .HasPrecision(9, 6)
-                        .HasColumnType("numeric(9,6)")
-                        .HasColumnName("longitude");
 
                     b.Property<string>("ReferenceNo")
                         .IsRequired()
@@ -131,14 +119,7 @@ namespace SmartCommunity.Api.Data.Migrations
 
                     b.HasIndex("ResidentId", "SubmittedAt");
 
-                    b.ToTable("reports", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_reports_coordinate_pair", "(latitude IS NULL AND longitude IS NULL) OR (latitude IS NOT NULL AND longitude IS NOT NULL)");
-
-                            t.HasCheckConstraint("CK_reports_latitude", "latitude IS NULL OR (latitude >= -90 AND latitude <= 90)");
-
-                            t.HasCheckConstraint("CK_reports_longitude", "longitude IS NULL OR (longitude >= -180 AND longitude <= 180)");
-                        });
+                    b.ToTable("reports", (string)null);
                 });
 
             modelBuilder.Entity("SmartCommunity.Api.Models.IssueCategory", b =>

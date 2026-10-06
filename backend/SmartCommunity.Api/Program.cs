@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using SmartCommunity.Api.Data;
+using SmartCommunity.Api.Endpoints;
 using SmartCommunity.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -165,6 +166,7 @@ app.MapGet("/api/v1/staff/me", (ClaimsPrincipal user) => Results.Ok(new { role =
     .RequireAuthorization(policy => policy.RequireRole(Roles.Staff, Roles.Administrator));
 app.MapGet("/api/v1/admin/me", (ClaimsPrincipal user) => Results.Ok(new { role = user.FindFirstValue(ClaimTypes.Role) }))
     .RequireAuthorization(policy => policy.RequireRole(Roles.Administrator));
+app.MapReportsEndpoints();
 
 if (args.Contains("--bootstrap-role"))
 {

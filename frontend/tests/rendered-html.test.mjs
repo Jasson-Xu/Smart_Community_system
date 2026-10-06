@@ -32,12 +32,12 @@ test("server-renders the Smart Community homepage", async () => {
   assert.match(html, /<title>Smart Community \| Report local issues<\/title>/i);
   assert.match(html, /A simpler way to make local issues visible\./);
   assert.match(html, /Report an issue/);
-  assert.match(html, /class="button button-primary" href="\/login\?intent=report"/);
+  assert.match(html, /href="\/reports\/new" class="button button-primary"/);
   assert.match(html, /Prototype preview/);
   assert.match(html, /href="\/privacy"/);
   assert.match(html, /href="\/security"/);
-  assert.match(html, /href="\/login\?intent=report(?:&amp;|&)category=roads-footpaths"/);
-  assert.match(html, /href="\/login\?intent=report(?:&amp;|&)category=street-lighting"/);
+  assert.match(html, /href="\/reports\/new\?category=roads-footpaths"/);
+  assert.match(html, /href="\/reports\/new\?category=street-lighting"/);
 });
 
 test("server-renders public privacy and security pages", async () => {
@@ -83,6 +83,20 @@ test("server-renders registration, login, logout, and account pages", async () =
   assert.match(logoutHtml, /Ready to sign out\?/);
   assert.match(logoutHtml, /Confirm sign out/);
   assert.match(accountHtml, /Loading account/);
+});
+
+test("server-renders resident report routes", async () => {
+  const [newResponse, listResponse, detailResponse] = await Promise.all([
+    render("/reports/new"),
+    render("/reports"),
+    render("/reports/SC-2026-EXAMPLE"),
+  ]);
+  assert.equal(newResponse.status, 200);
+  assert.equal(listResponse.status, 200);
+  assert.equal(detailResponse.status, 200);
+  assert.match(await newResponse.text(), /Tell us what needs attention/);
+  assert.match(await listResponse.text(), /My reports/);
+  assert.match(await detailResponse.text(), /SC-2026-EXAMPLE/);
 });
 
 test("uses the approved palette and production metadata", async () => {

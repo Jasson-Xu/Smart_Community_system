@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document records the target architecture for the Smart Community System. The Week 4 API and identity database are implemented; report processing, photograph storage, and AWS deployment remain target components.
+This document records the target architecture for the Smart Community System. The identity API and resident report submission, ownership, list, detail, and initial status history are implemented. Staff workflow processing, photograph storage, and AWS deployment remain target components.
 
 ## System context
 
@@ -19,7 +19,7 @@ Resident / Staff / Administrator
               |
            HTTPS
               |
-        React web client
+        React web client ------ Google Maps JavaScript API
               |
       ASP.NET Core Web API
         |               |
@@ -36,6 +36,7 @@ For local development, PostgreSQL will run in Docker and photograph storage may 
 
 - Presents role-appropriate interfaces.
 - Provides accessible forms and client-side feedback.
+- Uses Google Maps place search and map selection when a restricted browser key is configured.
 - Does not make authorisation decisions.
 - Sends validated request shapes to the API over HTTPS.
 
@@ -89,7 +90,6 @@ Rejected and reopened paths may be added when their rules, permissions, and audi
 - Authentication and token strategy.
 - Notification channels and provider.
 - Duplicate-report detection rules.
-- Geocoding and map provider, if any.
 - Operational retention schedule.
 - Production AWS region and network topology.
 - Recovery objectives, monitoring, and alerting thresholds.

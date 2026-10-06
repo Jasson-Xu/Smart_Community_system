@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { AuthShell } from "../_components/AuthShell";
 import { apiFetch } from "../_lib/api";
 
@@ -35,13 +36,16 @@ export default function AccountPage() {
             <h2>Account details</h2>
             <p>Email: {account.email}</p>
             <p>Role: {account.role}</p>
-            <p>Report submission and tracking will be connected in the next development stage.</p>
-            <a className="button button-secondary" href="/logout">Sign out</a>
+            {account.role === "Resident" ? <>
+              <p>Create a new community report or review issues already submitted from this account.</p>
+              <div className="logout-actions"><Link className="button button-primary" href="/reports/new">New report</Link><Link className="button button-secondary" href="/reports">My reports</Link></div>
+            </> : <p>The {account.role.toLowerCase()} operational dashboard is scheduled for a later week.</p>}
+            <Link className="button button-secondary account-signout" href="/logout">Sign out</Link>
           </>
         ) : (
           <>
             <p role="status">{status}</p>
-            <a className="button button-primary" href="/login">Sign in</a>
+            <Link className="button button-primary" href="/login">Sign in</Link>
           </>
         )}
       </div>

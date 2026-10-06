@@ -1,6 +1,6 @@
 # Smart Community API
 
-The Week 4 API provides PostgreSQL-backed resident registration, login, logout, session lookup, and role-protected staff and administrator session endpoints. Public registration always creates a resident account. Staff and administrator accounts can only be provisioned by an operator with database access.
+The API provides PostgreSQL-backed accounts and resident issue reporting. Public registration always creates a resident account. Staff and administrator accounts can only be provisioned by an operator with database access.
 
 ## Local setup
 
@@ -36,6 +36,10 @@ Prerequisites: .NET 10 SDK, Docker with Compose, and Node.js 22.13 or later for 
 | GET | `/api/v1/auth/me` | Signed in | Current account |
 | GET | `/api/v1/staff/me` | Staff or administrator | Role check |
 | GET | `/api/v1/admin/me` | Administrator | Role check |
+| GET | `/api/v1/categories` | Public | Active issue categories |
+| POST | `/api/v1/reports` | Resident | Create a report, optional map coordinates/Place ID, and its initial status history |
+| GET | `/api/v1/reports` | Resident | List reports owned by the current resident |
+| GET | `/api/v1/reports/{reference}` | Resident | Get one owned report and its status history |
 
 The browser sends credentials with requests. POST requests must include `X-Requested-With: XMLHttpRequest`; browser requests with an `Origin` header must match `Frontend:Origin`. The API accepts credentialed CORS requests only from that origin. Registration and login are limited to ten requests per minute per client IP. Cookies are HttpOnly and secure in non-development environments. Production must place the frontend and API on the same site and use HTTPS.
 
@@ -63,6 +67,6 @@ The local login page also displays these credentials. All three roles currently 
 
 ## Verification
 
-Run `dotnet build backend/SmartCommunity.Api` and `pwsh -File scripts/smoke-auth.ps1` after the database and API are running. The smoke test creates a synthetic resident, checks session and role protection, logs out, and checks that the session is gone. It requires no privileged account.
+Run `dotnet build backend/SmartCommunity.Api`, `pwsh -File scripts/smoke-auth.ps1`, and `pwsh -File scripts/smoke-reports.ps1` after the database and API are running. The report test creates synthetic residents and reports, then verifies input and coordinate validation, map metadata persistence, unique references, status history, ownership, and role restrictions.
 
-The API does not yet implement report submission, staff reports, photo storage, or account recovery. Those are scheduled in later weeks.
+The API does not yet implement photograph storage, staff workflow changes, comments, notifications, or account recovery. Those are scheduled in later weeks.
